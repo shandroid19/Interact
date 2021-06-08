@@ -1,0 +1,21 @@
+body{
+  background-color: #000036;
+  color:black;
+
+}
+
+.card{
+  background-color: #75c8ff
+
+  /* #7981f2; */
+  
+}
+.postcard{
+  max-height: 40rem;
+  max-width: 40rem;
+  overflow: hidden;
+}
+.dp{
+  max-height:5rem;
+  max-width: 5rem;
+}
