@@ -1,28 +1,20 @@
-// import Home from "./pages/home/Home";
-// import Profile from "./pages/profile/Profile";
+
 import React from 'react';
-import Register from "./components/Register";
-import Body from "./components/Body";
-import 'bootstrap/dist/css/bootstrap.min.css'
+import SearchComponent from './components/Search'
+import Notifications from './components/Notifications'
+import SinglePost from './components/SinglePost';
+// import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
-import Grid from '@material-ui/core/Grid'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import InputBase from '@material-ui/core/InputBase'
-import Search from '@material-ui/icons/Search'
+
+import {Badge,Grid,CssBaseline,AppBar,Avatar,Toolbar,IconButton,Typography,Container} from '@material-ui/core'
 import Feed from './components/Feed'
 import User from './components/User'
 import GLogin from "./components/GLogin"
-import UserSettings from './components/UserSettings'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUserEdit } from '@fortawesome/free-solid-svg-icons'
+import Chat from './components/Chat' 
+import ChatIcon from '@material-ui/icons/Chat'
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import { GoogleLogin,GoogleLogout} from 'react-google-login';
 import {
-  useRouteMatch,
   useHistory,
   BrowserRouter as Router,
   Switch,
@@ -30,25 +22,30 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
-import { useContext,useState,createContext,useEffect } from "react";
+import { useState,createContext,useEffect } from "react";
+import { ThemeProvider, createMuiTheme, createStyles } from "@material-ui/core/styles";
+
+
+
+
 export const AuthContext = createContext()
+
+
 const clientId ='504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com'
 function App() {
-  const history = useHistory() 
 
-  // const us = JSON.parse(localStorage.getItem('user'))
-  // const tok = JSON.parse(localStorage.getItem('token'))
+
+
   const [tok,setok] = useState(null)
   const [signin,setsignin] = useState(false);
   const [details,setdetails] = useState(null);
-  const [loading,setloading] = useState(false);
+  const [update,setupdate] = useState(false);
   const [user,setuser] = useState(null)
   const [current,setCurrent] = useState(null)
-  // const logout = async ()=>{await fetch('http://localhost:8000/auth/logout',{
-  //   method:'GET',headers:{'Content-Type':'application/json','Authorization':"bearer "+tok}})
-  // localStorage.clear();
-  //  setuser({})
-  // }
+  const [anchorEl, setAnchorEl] =useState(null);
+  const notopen = Boolean(anchorEl);
+  const [unread,setunread] = useState(0)
+  const notid = notopen ? 'not-popper' : undefined;
   useEffect(()=>{
     let obj;
     if(window.gapi){
@@ -79,18 +76,12 @@ function App() {
 
     if(user){
       getresp()
+     
+
     }
-  },[tok,details])
-//   function oSuccess(obj){  
-//   console.log(obj)
-//   setuser(obj.profileObj);setok(obj.tokenObj.id_token);
-//   if (history!==undefined){
-//     history.push('/signup')
-//   }
-// }
-  // const {signIn,loaded} = useGoogleLogin({clientId:clientId,onSuccess:oSuccess,isSignedIn:true})
+  },[tok,details,update])
+
   const logout = ()=>{console.log('logged out');window.location.reload();}
-  // signIn()
   async function getresp(){
         const resp = await fetch('http://localhost:8000/auth/login',{
         method:'POST',
@@ -98,64 +89,231 @@ function App() {
         headers:{'Content-Type':'application/json','Authorization':tok}
     })
        const out =await resp.json()
-      //  if(!localStorage.getItem('user'))
-      //       localStorage.setItem('user',JSON.stringify(out.user[0]))
-        
+
     if(resp.status===200 || resp.status===204){
         if(!details)
         setdetails(out.user)
         setsignin(false)
-        // console.log('yo')
+        setunread(out.user.unreadchats)
     }
     else{
         setsignin(true)
         console.log('user not found')
-        // window.location = "http://localhost:3000/signup";
-
-      // return <Redirect to='/signup'>
       }
   }
 
-
   const onSuccess = res=>{
-    // setuser(res.profileObj);
-    // setok(res.tokenObj.id_token);
     window.location.reload()
   }
-  const onFailure = (res) => {
-    setuser({})
-    console.log('Login failed: res:', res);
-    alert(
-        "Wrong username or password"
-      );
-  };
-  
+
+
+  const lightheme = createMuiTheme({
+    overrides: {
+      MuiCssBaseline: {
+  '@global': {
+    '*::-webkit-scrollbar':{
+      width: '10px'
+    },
+    
+    /* Track */
+    '*::-webkit-scrollbar-track':{
+      background: '#f1f1f1'
+    },
+     
+    /* Handle */
+    '*::-webkit-scrollbar-thumb':{
+      background: '#888'
+    },
+    
+    /* Handle on hover */
+    '*::-webkit-scrollbar-thumb:hover':{
+      background: '#555'
+    },
+  },
+      }
+    },
+
+    typography:{
+      fontFamily:["Armata",'sans-serif',"Encode Sans","sans-serif","Questrial",'sans-serif'],
+      h5:{
+      fontFamily: ["Audiowide", 'sans-serif'].join(',')
+      },
+      h6:{
+        fontFamily: ["Encode Sans","sans-serif","Questrial",'sans-serif'].join(',')
+         
+      },
+    },
+    palette: {
+      type:'light',
+      primary: 
+      {
+        // main:'#8f00ff', //violet
+        main:'#05Ce91', //green
+        // main:'#1EA5Fc', //blue
+        text: 'white'
+      },
+      secondary: {
+        light: '#0066ff',
+        main: '#0044ff',
+        contrastText: '#ffff',
+      },
+      info:{
+        main:'#4103fc',
+        light: '#0066ff'
+      },
+      background:{
+        // default:'#d6e9ff', //blue
+        // default:'#d4bdff', //violet
+        default:'#f7f0c8', //green
+        paper:'#d4ffdc',
+      },
+      contrastThreshold: 4,
+      
+
+      tonalOffset: 0.2,
+    },
+  });
+
+  const darktheme = createMuiTheme({
+    overrides: {
+      MuiCssBaseline: {
+  '@global': {
+    '*::-webkit-scrollbar':{
+      width: '0.6rem',
+    },
+    
+    /* Track */
+    '*::-webkit-scrollbar-track':{
+      background: '#f1f1f1'
+    },
+     
+    /* Handle */
+    '*::-webkit-scrollbar-thumb':{
+      background: '#888'
+    },
+    
+    /* Handle on hover */
+    '*::-webkit-scrollbar-thumb:hover':{
+      background: '#555'
+    },
+  },
+      }
+    },
+    typography:{
+      fontFamily:["Armata",'sans-serif',"Encode Sans","sans-serif","Questrial",'sans-serif'],
+      h5:{
+      fontFamily: ["Audiowide", 'sans-serif'].join(',')
+      },
+      h6:{
+        fontFamily: ["Encode Sans","sans-serif","Questrial",'sans-serif'].join(',')
+         
+      },
+    },
+    palette: {
+      type:'dark'
+      ,
+      primary: 
+      {
+        // main:'#8f00ff', //violet
+        main:'#383838', //green
+        // main:'#1EA5Fc', //blue
+        text: 'white'
+      },
+      secondary: {
+        main: '#8a8a8a',
+        contrastText: '#ffffff',
+      },
+      info:{
+        main:'#4103fc',
+        light: '#0066ff'
+      },
+      background:{
+        // default:'#d6e9ff', //blue
+        // default:'#d4bdff', //violet
+        default:'black', //green
+        paper:'#474747',
+      },
+      contrastThreshold: 4,
+
+      tonalOffset: 0.2,
+    },
+  });
+
 
   return (
-
+    < ThemeProvider theme={details?.darkmode?darktheme:lightheme}>
     <AuthContext.Provider value={{user,setuser,tok,details}}>
-    
-    <Router>
-      <Switch> 
-        <div>
-          <AppBar position='static'>
-        <Toolbar>
-          <Grid container>
-          <Typography variant="h6">
-          Pigeon
-          </Typography>
-  
-         <Search/>
+    <CssBaseline/>
+    <Router >
+    <Switch> 
+      <>
 
-         <div style={{marginLeft:'auto'}}>  
-         <Grid container>
-           <Grid item xs={4}>  
-         <Link style={{textDecoration:'None',color:'white',marginLeft:'2rem'}} to='/user'>User</Link>
-          </Grid>    
-          <Grid item xs={4}>    
-        <Link style={{textDecoration:'None',color:'white',marginLeft:'2rem'}} to='/settings'>Edit</Link>
+          {signin?<></>:<AppBar position='static'>
+        <Toolbar >
+            <Container>
+          <Grid container alignItems='center'>
+            <Grid item lg={8} md={7} xs={12}>
+              <Grid container justify='center'>
+                <Grid item xs={5}>
+                  <Grid container>
+                    <Grid item>
+          <Link style={{textDecoration:'none'}} to='/feed'>
+          <Typography color='textPrimary' variant="h5">
+          Interact
+          </Typography>
+          </Link>
           </Grid>
-        <Grid item xs={4}> 
+          </Grid>
+          </Grid>
+          <Grid item xs={7}>
+            <Grid container justify='flex-start'>
+              <Grid id='grr' item xs={12}>
+            <div><SearchComponent/></div>
+            </Grid>
+            </Grid>
+            </Grid>
+
+          </Grid>
+            </Grid>
+
+
+          
+         <Grid item lg={4} md={5} xs={12} >
+           <Grid container justify='center' alignItems='center'>
+
+          <Grid item xs={2}>  
+          {user && !signin?<Link style={{textDecoration:'None'}} to='/feed'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
+          </Grid>   
+          <Grid item xs={2}>   
+        <Link style={{textDecoration:'None'}} to='/chat'  >
+          <IconButton>
+          {!details?.unreadchats?
+          <ChatIcon/>:
+          <Badge color='error' badgeContent={unread}>
+          <ChatIcon />
+          </Badge>}
+          </IconButton>
+          </Link>
+          </Grid>
+          <Grid item xs={2}>    
+          <Link  style={{textDecoration:'None'}} to='/notification'>
+            <IconButton>
+          {!details?.notifications?
+          <NotificationsIcon/>:
+          <Badge color='error' badgeContent={details.notifications}>
+          <NotificationsIcon />
+          </Badge>}
+          </IconButton>
+          </Link>
+          </Grid>
+          <Grid item xs={2} >    
+          {details?<IconButton><div><Link style={{textDecoration:'None',textAlign:'center'}} color='textPrimary' to={`/users/${details.userId}`}>
+            {/* <img width='30rem' height='30rem' style={{borderRadius:'50%',marginRight:'0.5rem'}} src={details.profilePicture}></img> */}
+            <Avatar src={details.profilePicture}></Avatar>
+            </Link></div></IconButton>:<Link style={{textDecoration:'None',color:'white',textAlign:'center'}} to='/signup'>SignUp</Link>}
+          
+          </Grid>
+          <Grid item > 
         {user?
          <div>
           <GoogleLogout
@@ -173,79 +331,37 @@ function App() {
         cookiePolicy={'single_host_origin'}
         isSignedIn={true}></GoogleLogin></div>
         }
+        {/* </MenuItem> */}
         </Grid>
         </Grid>
+        </Grid> 
  
-          </div>
+          
           </Grid>
+          </Container>
           </Toolbar>
         </AppBar>
-         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-            <h1 className=' m-5 navbar-brand'>Pigeon</h1>
-          <ul className="navbar-nav mr-auto">
-          {user && !signin?<> <li><Link to='/feed' className="nav-link m-2"> Feed </Link></li>
-            <li><Link to='/about' className="nav-link m-2">About </Link></li>
-            <li><Link to='/settings' className='nav-link m-2'>Edit <FontAwesomeIcon icon={faUserEdit} /></Link></li></>:<></>}
-           {signin?<li><Link to='/signup' className='nav-link m-2'>Signup</Link></li>:<></>}
-          </ul>
-          
-          {details && !signin?<Link to={`/users/${user.googleId}`}className='btn btn-secondary ms-auto'><h4>{details.username}</h4></Link>:<></>}
-          
-            <div className='row align-items-center mr-5 ms-auto'> 
-
-      <div className='col-4'><input className="form-control mr-sm-2 " type="search" placeholder="Search" aria-label="Search"/></div>
-      <div className='col-2'><button className="btn btn-outline-success " type="submit">Search</button></div>
-             
-      {/* {user?<div className='col-6'><div className='row'><div className='col-6 m-3'><Link className='btn btn-secondary' to='/user'><h4 className = 'col-6'style={{color:'floralwhite'}}>{user.username}</h4></Link></div><div className ='col-5 m-3'><Link to = '/login'className="btn btn-danger" onClick={logout}>logout</Link></div></div></div>
-          : <div className='col-6'><Link to='/login' className="btn btn-success m-4">login</Link></div>}
-        //  </div> */}   
-          {/* {user?<div className='col-6'><div className='row'><div className='col-6 m-3'><Link className='btn btn-secondary' to='/user'><h4 className = 'col-6'style={{color:'floralwhite'}}>{user.username}</h4></Link></div><div className ='col-5 m-3'><Link to = '/login'className="btn btn-danger" onClick={logout}>logout</Link></div></div></div>
-          : <div className='col-6'><Link to='/login' className="btn btn-success m-4">login</Link></div>}
-         </div> */}
-         
-         {/* {signin?<Redirect to='/signup'/>:<></>} */}
-         {user?
-         <div className='col-6'>
-          <GoogleLogout
-          clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
-          buttonText="Logout"
-          onLogoutSuccess={logout}>
-          </GoogleLogout>
-          </div>
-         :<div className='col-6'>
-         <GoogleLogin
-        clientId={clientId}
-        redirectUri={'/'}
-        buttonText="Login"
-        onSuccess={onSuccess}
-        // onFailure={onFailure}
-        cookiePolicy={'single_host_origin'}
-        isSignedIn={true}></GoogleLogin></div>
         }
-                  {/* <GoogleLogout
-          clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
-          buttonText="Logout"
-          onLogoutSuccess={logout}>
-          </GoogleLogout> */}
-        </div>
-          </nav>
-        <Route exact path="/">
-
-         {/* <Body /> */}
-        </Route>
         <Route path="/signup">
           <GLogin/>
         </Route>
-        <Route path="/register">
-          <Register /></Route>
+         {signin?<Redirect to='/signup'/>:<></>}
+        {/* <Route path="/">
+          <Redirect to='/signup'/></Route> */}
           <Route path='/user'>{!details?<></>:<div><User/><Feed /></div>}</Route>
           <Route path='/feed'>{!details?<></>:<Feed />}</Route>
-          <Route path='/settings'>{!details?<></>:<UserSettings/>}</Route>
+          {/* <Route path='/chat'>{!details?<></>:<Chat/>}</Route> */}
+          <Route path='/chat'>{!details?<></>:<Chat setupdate={setupdate}update={update}/>}</Route>
           <Route path='/users/:id' >{!details?<></>:<><User/><Feed/></>}</Route>
-          </div>
+          <Route path='/notification' >{!details?<></>:<Notifications/>}</Route>
+          <Route path='/search'><SearchComponent/></Route>
+          <Route path='/post/:postid'><SinglePost/></Route>
+          </>
       </Switch>
+      
     </Router>
     </AuthContext.Provider>
+    </ ThemeProvider>
   );
 }
 

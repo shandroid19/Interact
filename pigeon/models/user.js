@@ -21,7 +21,7 @@ const CommentSchema = new mongoose.Schema(
     likes:{
       type: Number,
       default: 0
-    }
+    },
   },
   { timestamps: true }
 );
@@ -63,10 +63,12 @@ const Users = new Schema(
   {
     userId:{
       type:String,
-      required:true
+      required:true,
+      index:true
     },
     name:{
-      type:String
+      type:String,
+      default:""
     },
     username: {
       type: String,
@@ -92,14 +94,18 @@ const Users = new Schema(
       type: String,
       default: "",
     },
-    followers: {
-      type: Array,
-      default: [],
+    notifications:{
+      type: Number,
+      default: 0
     },
-    followings: {
-      type: Array,
-      default: [],
+    private:{
+      type:Boolean
     },
+    darkmode:{
+      type:Boolean,
+      default:false
+    },
+
     bio: {
       type: String,
       max: 50,
@@ -107,6 +113,10 @@ const Users = new Schema(
     city: {
       type: String,
       max: 50,
+    },
+    unreadchats:{
+      type:Number,
+      default:0
     },
     posts: [PostSchema]
   },
@@ -120,7 +130,7 @@ const Users = new Schema(
 //   }
 // });
 
-Users.plugin(passportLocalMongoose);
+// Users.plugin(passportLocalMongoose);
 module.exports = mongoose.model("users", Users);
 // const UserModel = new Schema({
 //     username:{type: String, required:true, unique:true},

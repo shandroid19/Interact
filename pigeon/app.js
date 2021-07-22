@@ -19,6 +19,9 @@ const index = require('./routes/index');
 const auth = require('./routes/auth');
 const user = require('./routes/users')
 const post =  require('./routes/posts');
+const chats =  require('./routes/chats');
+
+
 const url = config.mongoUrl
 dotenv.config();
 mongoose.connect(
@@ -45,11 +48,12 @@ app.use(morgan('dev'))
 app.use(cors())
 
 app.use(cookieParser(config.secretKey))
-app.use(passport.initialize())
-app.use(passport.session())
+// app.use(passport.initialize())
+// app.use(passport.session())
 app.use('/',index)
 app.use('/user',user)
 app.use('/auth',auth)
+app.use('/chats',chats)
 app.use('/posts',post)
 
 // function authe(req,res,next){
