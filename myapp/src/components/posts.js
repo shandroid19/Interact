@@ -4,26 +4,12 @@ import {AuthContext} from '../App'
 import CheckCircleOutlinedIcon from '@material-ui/icons/CheckCircleOutlined';
 import DeleteForeverOutlined from '@material-ui/icons/DeleteForeverOutlined';
 import CheckCircle from '@material-ui/icons/CheckCircle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import TextField from '@material-ui/core/TextField'
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
-import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {Button,Avatar,ButtonBase} from '@material-ui/core'
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Picker from 'emoji-picker-react';
-import Popover from '@material-ui/core/Popover';
 import EmojiEmotions from '@material-ui/icons/EmojiEmotions'
 import {makeStyles,useTheme} from '@material-ui/styles'
+import Picker from 'emoji-picker-react';
+import { Dialog,Typography,DialogTitle,DialogContent,TextField,Grid,Popover,Accordion,AccordionSummary,AccordionDetails,CardContent,Box,Button,ButtonBase,Avatar,Card,CardHeader } from "@material-ui/core";
 import {format} from 'timeago.js'
 
 
@@ -31,11 +17,11 @@ import {format} from 'timeago.js'
 // background:'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
 
 
-const useStyles = makeStyles((theme) => ({
-  small: {
-      margin:theme.spacing(1)
-  },
-}))
+// const useStyles = makeStyles((theme) => ({
+//   small: {
+//       margin:theme.spacing(1)
+//   },
+// }))
 
 export default function Post({post})
 {
@@ -65,7 +51,7 @@ export default function Post({post})
     
     const like = ()=>
     {
-        fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/like',
+        fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/like',
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -78,7 +64,7 @@ export default function Post({post})
   
     const deletepost = ()=>
     {
-        fetch('http://localhost:8000/posts/'+post._id,
+        fetch('https://interact-9535.herokuapp.com/posts/'+post._id,
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -100,7 +86,7 @@ export default function Post({post})
    
     const postcomment = ()=>{
       // console.log(post.userId,post._id)
-      fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/comment',
+      fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/comment',
       {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -117,7 +103,7 @@ export default function Post({post})
 
       const deletecomment = ()=>{
         // console.log(post.userId,post._id)
-        fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/comment/'+comment._id,
+        fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/comment/'+comment._id,
         {
         method:'DELETE',
         headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -140,7 +126,7 @@ export default function Post({post})
     })
 
     const getlikes = ()=>{
-      fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/getlikes?p='+1,
+      fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/getlikes?p='+1,
       {
           method:'GET',
           headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -154,7 +140,7 @@ export default function Post({post})
 
   const getcomments = ()=>{
     if(commentpages<=commentmax){
-    fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/comment?p='+commentpages,
+    fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/comment?p='+commentpages,
     {
         method:'GET',
         headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -180,7 +166,7 @@ export default function Post({post})
 
 useEffect(()=>{
 
-  fetch('http://localhost:8000/posts/'+post.userId+'/'+post._id+'/getlikes?p='+likepage,
+  fetch('https://interact-9535.herokuapp.com/posts/'+post.userId+'/'+post._id+'/getlikes?p='+likepage,
   {
       method:'GET',
       headers:{'Content-Type':'application/json','Authorization':context.tok},

@@ -13,7 +13,6 @@ router.route('/')
         Post.create({userId:userid,
           caption:req.body.caption,img:req.body.image})
         .then((post)=>{
-          console.log(req.body)
             res.status(200).json(post)
         })
       }).catch((err)=>res.status(500).json(err))
@@ -86,8 +85,11 @@ router.route('/:id')
 
 router.route('/:id/posts')
 .options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
-.get(cors.corsWithOptions,(req, res) => {
-  authenticate(req.headers.authorization).then((userid)=>{
+.get(cors.corsWithOptions,async (req, res) => {
+  const userid = await authenticate(req.headers.authorization)
+    // console.log(req.headers.authorization)
+    Details.findOne({userId:userid},'followings').then((data)=>{
+    if(data.followings.indexOf(req.params.id)!==-1){
     Post.find({userId:req.params.id}).countDocuments().then((len)=>{
       const page = parseInt(req.query.p)
       Post.find({userId:req.params.id}).sort({"createdAt":-1}).skip(page*3-3).limit(3).then((posts)=>{
@@ -107,11 +109,17 @@ router.route('/:id/posts')
       })
       })
     })
+  }
+  else
+  throw 'private';
   }).catch((err)=>{
-    res.statusCode = 401;
+    res.statusCode = 200;
     res.setHeader('Content-Type','application/json')
-    res.json(err)
+    res.json({posts:[],pages:0})
   })
+
+
+// })
 })
 
 router.route('/:id/post')
@@ -124,9 +132,9 @@ router.route('/:id/post')
         res.statusCode = 200;
         res.setHeader('Content-Type','application/json')
         const response= ({_id:post._id,createdAt:post.createdAt,img:post.img,profilePicture:user.profilePicture,
-          username:user.username,comments:post.comments.length,likes:post.likes,caption:post.caption,userId:user.userId})
+          username:user.username,comments:post.comments.length,likes:post.likes,caption:post.caption,userId:user.userId}) 
+        
         res.json({post:response})
-
         })
         }).catch((err)=>{
           res.statusCode = 401;

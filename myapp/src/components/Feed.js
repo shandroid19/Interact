@@ -26,6 +26,26 @@ import Skeleton from '@material-ui/lab/Skeleton';
      const loader = useRef(null);
  
      useEffect(() => {
+         if(id!==prev)
+         {
+            console.log("calling")
+            const link = id?'https://interact-9535.herokuapp.com/posts/'+id+'/posts?p='+page:'https://interact-9535.herokuapp.com/posts?p='+page
+
+            if(max>=page){fetch(link,{
+               method:'GET',
+               headers:{'Content-Type':'application/json','Authorization':context.tok}
+           }).then((res)=>{ 
+               return res.json()
+           }).then((response)=>{
+            setposts(posts=>response.posts)
+            setmax(response.pages)     
+           })
+        }
+
+            setprev(prev=>id)
+         }
+         console.log(id,prev)
+         console.log(posts)
          setloading(true)
          setTimeout(()=>setloading(false),2000)
           var options = {
@@ -50,27 +70,39 @@ import Skeleton from '@material-ui/lab/Skeleton';
      useEffect(() => { 
         // page==1 && setposts([])
         // console.log(page)
-        const link = id?'http://localhost:8000/posts/'+id+'/posts?p='+page:'http://localhost:8000/posts?p='+page
+        const link = id?'https://interact-9535.herokuapp.com/posts/'+id+'/posts?p='+page:'https://interact-9535.herokuapp.com/posts?p='+page
          if(max>=page){fetch(link,{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
         }).then((res)=>{
-            console.log(id)
+            
             return res.json()
         }).then((response)=>{
-            if(id !== prev)
-            { setposts([])
-             setprev(id)
-             console.log(id,prev)
-            }
-            else{
-                console.log('hey')
-             setposts(posts.concat(response.posts))
+        // if(id){
+        //     console.log(prev,id)
+
+        //     if(id !== prev && id!='')
+        //         console.log(id,prev)
+        //     // window.location.reload();
+        //     // {
+        //     //     // const myPromise = new Promise
+        //     // setposts([])
+        //     //  setprev(id)
+        //     //  console.log(id,prev)
+        //     // }
+        //     // {
+        //      setposts(posts=>posts.concat(response.posts))
+        //     setmax(response.pages)
+        //     // }
+        // }
+        // else
+        if(id==prev)
+        {
+            setposts(posts=>posts.concat(response.posts))
             setmax(response.pages)
-            }
+        }
         })
     }
-
      }, [page,id])
      const handleObserver = (entities) => {
         const target = entities[0];
@@ -80,14 +112,13 @@ import Skeleton from '@material-ui/lab/Skeleton';
             
         }
     }
-    console.log(posts)
 
 
     const post = posts.map((pos,index)=>{
        return (<div key={index}><Grid container  justify='center'>
            <Grid style={{width:'100%'}} item sm={10} md={8} lg={6} xs={12}><Post post={pos}></Post></Grid>
            </Grid></div>)
-    })
+    }) 
     return (<>
     {post.length?post:<div><Grid style={{marginTop:'2rem',marginBottom:'3rem'}} container justify='center'>
           <Grid item xs={6}>

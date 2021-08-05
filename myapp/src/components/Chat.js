@@ -48,7 +48,7 @@ export default function Chat({setupdate,update})
         if(!window.gapi)
            signIn()
         if(!chatid) setloading(true)
-        fetch('http://localhost:8000/chats'+(chatid?`?id=${chatid}&p=${page}`:''),{
+        fetch('https://interact-9535.herokuapp.com/chats'+(chatid?`?id=${chatid}&p=${page}`:''),{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
         // }).then((resp)=>{return resp.json()}).then((res)=>{setchats(res);if(chatid)setuser(res)})
@@ -62,7 +62,8 @@ export default function Chat({setupdate,update})
      },[window.gapi,chatid]) 
 
     useEffect(()=>{
-        socket.current = io('ws://localhost:8900')
+        // socket.current = io('https://interact-3d602.web.app/')
+        socket.current = io('https://interactchat-9535.herokuapp.com/')
         socket.current.on('getMessage',data=>{
             setincoming({
                 sender:data.sender,
@@ -105,7 +106,7 @@ export default function Chat({setupdate,update})
 
     useEffect(()=>{
         incoming && (chatid===incoming.sender || context.details.userId===incoming.sender) && setmessages((prev)=>[...prev,incoming]) &&  scrollRef.current?.scrollIntoView({ behavior: "smooth" })
-        if(max>=page){fetch('http://localhost:8000/chats',{
+        if(max>=page){fetch('https://interact-9535.herokuapp.com/chats',{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
         }).then((resp)=>{return resp.json()})
@@ -118,7 +119,7 @@ export default function Chat({setupdate,update})
         })
     }
 
-            fetch('http://localhost:8000/chats'+`?id=${chatid}&p=1`,{
+            fetch('https://interact-9535.herokuapp.com/chats'+`?id=${chatid}&p=1`,{
                 method:'GET',
                 headers:{'Content-Type':'application/json','Authorization':context.tok},
             }).then((resp)=>{return resp.json()})
@@ -134,7 +135,7 @@ export default function Chat({setupdate,update})
         // if(init && page>1)
         // {
             if(max>=page &&user){
-        fetch('http://localhost:8000/chats/'+user.conversationId+`?id=${chatid}&p=${page}`,{
+        fetch('https://interact-9535.herokuapp.com/chats/'+user.conversationId+`?id=${chatid}&p=${page}`,{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.details.tok},
         }).then((resp)=>{return resp.json()}).then((res)=>{
@@ -185,7 +186,7 @@ export default function Chat({setupdate,update})
                 message:msg.current.value
             });
             
-            fetch('http://localhost:8000/chats/sendmessage',{
+            fetch('https://interact-9535.herokuapp.com/chats/sendmessage',{
             method:'POST',
             body: JSON.stringify({message:msg.current.value,conversationId:user.conversationId}),
             headers:{'Content-Type':'application/json','Authorization':context.tok},
@@ -259,7 +260,7 @@ export default function Chat({setupdate,update})
                   </Box>
               </Grid>
               {/* {del==='old'+key?<IconButton onClick={()=>{
-                    fetch('http://localhost:8000/chats/delete?id='+item._id,{
+                    fetch('https://interact-9535.herokuapp.com/chats/delete?id='+item._id,{
                         method:'DELETE',
                         headers:{'Content-Type':'application/json','Authorization':context.details.tok},
                     })
@@ -284,7 +285,7 @@ export default function Chat({setupdate,update})
               </Grid>
               {/* {del==='new'+key?<IconButton onClick={
                   ()=>{
-                    fetch('http://localhost:8000/chats/delete?id='+item._id,{
+                    fetch('https://interact-9535.herokuapp.com/chats/delete?id='+item._id,{
                         method:'DELETE',
                         headers:{'Content-Type':'application/json','Authorization':context.details.tok},
                     })

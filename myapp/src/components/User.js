@@ -39,7 +39,7 @@ const [followerpage,setfollowerpage] = useState(1)
 const [followermax,setfollowermax] = useState(1)
     const history = useHistory()
     useEffect(()=>{
-        fetch('http://localhost:8000/user/'+id+'/get',
+        fetch('https://interact-9535.herokuapp.com/user/'+id+'/get',
         {
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -48,7 +48,7 @@ const [followermax,setfollowermax] = useState(1)
     useEffect(()=>{if(details)setdp(details.profilePicture)},[details])
     const setEdit = ()=>{setedit(true);setdark(details.darkmode);setpriv(details.private)}
     const follow = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/follow',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/follow',
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -56,7 +56,7 @@ const [followermax,setfollowermax] = useState(1)
         window.location.reload()
     }
     const unfollow = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/unfollow',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/unfollow',
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -65,7 +65,7 @@ const [followermax,setfollowermax] = useState(1)
     }
 
     const sendrequest = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/sendrequest',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/sendrequest',
         {
             method:'POST',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -74,7 +74,7 @@ const [followermax,setfollowermax] = useState(1)
     }
 
     const cancelrequest = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/cancelrequest',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/cancelrequest',
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -83,7 +83,7 @@ const [followermax,setfollowermax] = useState(1)
     }
 
     const rejectrequest = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/rejectrequest',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/rejectrequest',
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -91,7 +91,7 @@ const [followermax,setfollowermax] = useState(1)
         window.location.reload()
     }
     const acceptrequest = ()=>{
-        fetch('http://localhost:8000/user/'+eyed+'/acceptrequest',
+        fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/acceptrequest',
         {
             method:'POST',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -124,7 +124,7 @@ const [followermax,setfollowermax] = useState(1)
     {   
         e.preventDefault();
         console.log(context.tok)
-        fetch('http://localhost:8000/user',{
+        fetch('https://interact-9535.herokuapp.com/user',{
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
             body: JSON.stringify({username:username.current.value,name:name.current.value,profilePicture:dp,city:city.current.value,bio:bio.current.value,darkmode:dark,private:priv}),
@@ -132,7 +132,7 @@ const [followermax,setfollowermax] = useState(1)
         } 
 
     const getfollowers = ()=>{
-        fetch('http://localhost:8000/user/'+details.userId+'/followers?p=1',{
+        fetch('https://interact-9535.herokuapp.com/user/'+details.userId+'/followers?p=1',{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
             
@@ -146,7 +146,7 @@ const [followermax,setfollowermax] = useState(1)
 
 
     const getfollowings = ()=>{
-        fetch('http://localhost:8000/user/'+details.userId+'/followings?p=1',{
+        fetch('https://interact-9535.herokuapp.com/user/'+details.userId+'/followings?p=1',{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
             
@@ -174,7 +174,7 @@ const handleObserver = (entities) => {
 
 useEffect(()=>{
     if(details){
-    fetch('http://localhost:8000/user/'+details?.userId+'/followers?p='+followerpage,{
+    fetch('https://interact-9535.herokuapp.com/user/'+details?.userId+'/followers?p='+followerpage,{
         method:'GET',
         headers:{'Content-Type':'application/json','Authorization':context.tok},
     }).then((res)=>{return res.json()})
@@ -201,10 +201,18 @@ useEffect(() => {
 
 }, [followers,followermax]);
 
-const followersdialog =<Dialog open={openfollowers} onClose={()=>setopenfollowers(false)}>
+// const followersdialog =<Dialog open={openfollowers} onClose={()=>setopenfollowers(false)}>
+// <DialogTitle style={{paddingBottom:0}}><Typography>Followers</Typography></DialogTitle>
+// <DialogContent style={{height:'60vh'}}>
+// { followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+// </CardHeader></ButtonBase>})}
+// <div ref={followerloader}></div>
+// </DialogContent>
+// </Dialog>
+const followersdialog =<Dialog  open={openfollowers} onClose={()=>setopenfollowers(false)}>
 <DialogTitle style={{paddingBottom:0}}><Typography>Followers</Typography></DialogTitle>
 <DialogContent style={{height:'60vh'}}>
-{ followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+{ followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
 </CardHeader></ButtonBase>})}
 <div ref={followerloader}></div>
 </DialogContent>
@@ -224,7 +232,7 @@ const handleobserver = (entities) => {
 
 useEffect(()=>{
     if(details){
-    fetch('http://localhost:8000/user/'+details.userId+'/followings?p='+followingspage,{
+    fetch('https://interact-9535.herokuapp.com/user/'+details.userId+'/followings?p='+followingspage,{
         method:'GET',
         headers:{'Content-Type':'application/json','Authorization':context.tok},
     }).then((res)=>{return res.json()})
@@ -253,7 +261,7 @@ useEffect(() => {
 
 const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollowings(false)}>
 <DialogTitle style={{paddingBottom:0}}><Typography>Following</Typography></DialogTitle>
-<DialogContent style={{height:'5vh'}}>
+<DialogContent style={{height:'60vh'}}>
 { followings.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
 </CardHeader></ButtonBase>})}
 <div ref={followingsloader}></div>

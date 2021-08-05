@@ -18,7 +18,7 @@ const [page,setpage] = useState(1)
 
 useEffect(()=>{
     setloading(true)
-    fetch('http://localhost:8000/user/notifications?p='+page,{
+    fetch('https://interact-9535.herokuapp.com/user/notifications?p='+page,{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
     }).then((resp)=>{return resp.json()})
@@ -27,7 +27,7 @@ useEffect(()=>{
 },[page])
 
 const clear= ()=>{
-    fetch('http://localhost:8000/user/clearnotifications',{
+    fetch('https://interact-9535.herokuapp.com/user/clearnotifications',{
         method:'GET',
         headers:{'Content-Type':'application/json','Authorization':context.tok}
 })
@@ -47,7 +47,7 @@ const req = requests.map((req)=>{
                 </Grid>
                 <Grid item xs={6} style={{display:'flex',justifyContent:'left'}} >
                 <Button style={{marginRight:'1rem'}} onClick={()=>{
-    fetch('http://localhost:8000/user/'+req.userId+'/acceptrequest',
+    fetch('https://interact-9535.herokuapp.com/user/'+req.userId+'/acceptrequest',
     {
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':context.tok}
@@ -55,7 +55,7 @@ const req = requests.map((req)=>{
     window.location.reload()
 }} variant='contained' color='primary'>Accept</Button>
                 <Button onClick={ ()=>{
-    fetch('http://localhost:8000/user/'+req.userId+'/rejectrequest',
+    fetch('https://interact-9535.herokuapp.com/user/'+req.userId+'/rejectrequest',
     {
         method:'DELETE',
         headers:{'Content-Type':'application/json','Authorization':context.tok}

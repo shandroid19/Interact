@@ -12,7 +12,9 @@ const Newusers = require('../models/newUsers')
 router.route('/login')
 .options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
 .post(cors.cors,async (req,res)=>{
+    
     authenticate(req.headers.authorization).then((userid)=>{
+        console.log(userid)
         User.findOne({userId:userid},'userId name username profilePicture city bio darkmode private notifications unreadchats').then((user)=>{
             if(!user) throw new Error('not found')
             Newusers.find({}).then((newusers)=>{

@@ -36,7 +36,7 @@ const [jokes,setjokes]=useState(false)
 
    const onSuccess = (obj)=>
    {
-      fetch('http://localhost:8000/auth/login',{
+      fetch('https://interact-9535.herokuapp.com/auth/login',{
          method:'POST',
          body: JSON.stringify({userId:obj.profileObj.googleId}),
          headers:{'Content-Type':'application/json','Authorization':obj.profileObj.googleId}
@@ -58,7 +58,7 @@ const [jokes,setjokes]=useState(false)
    function onf(ob){
       // setdetails(ob.profileObj);
       // setok(ob.profileObj.tokenObj.id_token)
-      fetch('http://localhost:8000/auth/login',{
+      fetch('https://interact-9535.herokuapp.com/auth/login',{
          method:'POST',
          body: JSON.stringify({userId:ob.profileObj.googleId}),
          headers:{'Content-Type':'application/json','Authorization':ob.tokenObj.id_token}
@@ -74,7 +74,7 @@ const [jokes,setjokes]=useState(false)
    async function handleSubmit(e)
   {   
       e.preventDefault();
-      const resp= await fetch('http://localhost:8000/auth/signup',{
+      const resp= await fetch('https://interact-9535.herokuapp.com/auth/signup',{
           method:'POST',
           body: JSON.stringify({userId:context.user.googleId,email:context.user.email,username:username.current.value,name:name.current.value,profilePicture:context.user.imageUrl,city:city.current.value,bio:bio.current.value,darkmode:dark,priv:priv}),
           headers:{'Content-Type':'application/json','Authorization':context.tok}

@@ -11,7 +11,7 @@ export default function SinglePost()
     const context = useContext(AuthContext)
     useEffect(()=>{
         if (context.tok){
-        fetch('http://localhost:8000/posts/'+postid+'/post',
+        fetch('https://interact-9535.herokuapp.com/posts/'+postid+'/post',
         {
             method:'POST',
             headers:{'Content-Type':'application/json','Authorization':context.tok},

@@ -20,7 +20,7 @@ const auth = require('./routes/auth');
 const user = require('./routes/users')
 const post =  require('./routes/posts');
 const chats =  require('./routes/chats');
-
+const PORT = process.env.PORT || 8000;
 
 const url = config.mongoUrl
 dotenv.config();
@@ -70,7 +70,7 @@ app.use('/posts',post)
 app.use((req, res, next) => {
   next(createError(404));
 });
-app.listen(8000,()=>{
+app.listen(PORT,()=>{
   console.log("running...");
 })
 module.exports = app;

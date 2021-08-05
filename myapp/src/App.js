@@ -23,7 +23,7 @@ import {
   Redirect
 } from "react-router-dom";
 import { useState,createContext,useEffect } from "react";
-import { ThemeProvider, createMuiTheme, createStyles } from "@material-ui/core/styles";
+import { ThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 
 
 
@@ -41,11 +41,10 @@ function App() {
   const [details,setdetails] = useState(null);
   const [update,setupdate] = useState(false);
   const [user,setuser] = useState(null)
-  const [current,setCurrent] = useState(null)
-  const [anchorEl, setAnchorEl] =useState(null);
-  const notopen = Boolean(anchorEl);
+  // const [anchorEl, setAnchorEl] =useState(null);
+  const notopen = Boolean(null);
   const [unread,setunread] = useState(0)
-  const notid = notopen ? 'not-popper' : undefined;
+  // const notid = notopen ? 'not-popper' : undefined;
   useEffect(()=>{
     let obj;
     if(window.gapi){
@@ -83,7 +82,7 @@ function App() {
 
   const logout = ()=>{console.log('logged out');window.location.reload();}
   async function getresp(){
-        const resp = await fetch('http://localhost:8000/auth/login',{
+        const resp = await fetch('https://interact-9535.herokuapp.com/auth/login',{
         method:'POST',
         body: JSON.stringify({userId:user.googleId}),
         headers:{'Content-Type':'application/json','Authorization':tok}
@@ -239,7 +238,7 @@ function App() {
     },
   });
 
-
+const history = useHistory();
   return (
     < ThemeProvider theme={details?.darkmode?darktheme:lightheme}>
     <AuthContext.Provider value={{user,setuser,tok,details}}>
@@ -257,7 +256,7 @@ function App() {
                 <Grid item xs={5}>
                   <Grid container>
                     <Grid item>
-          <Link style={{textDecoration:'none'}} to='/feed'>
+          <Link style={{textDecoration:'none'}} to='/'>
           <Typography color='textPrimary' variant="h5">
           Interact
           </Typography>
@@ -282,7 +281,7 @@ function App() {
            <Grid container justify='center' alignItems='center'>
 
           <Grid item xs={2}>  
-          {user && !signin?<Link style={{textDecoration:'None'}} to='/feed'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
+          {user && !signin?<Link style={{textDecoration:'None'}} to='/'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
           </Grid>   
           <Grid item xs={2}>   
         <Link style={{textDecoration:'None'}} to='/chat'  >
@@ -307,7 +306,8 @@ function App() {
           </Link>
           </Grid>
           <Grid item xs={2} >    
-          {details?<IconButton><div><Link style={{textDecoration:'None',textAlign:'center'}} color='textPrimary' to={`/users/${details.userId}`}>
+          {details?<IconButton ><div><Link to={`/users/${details.userId}`} style={{textDecoration:'None',textAlign:'center'}} color='textPrimary'>
+          {/* to={`/users/${details.userId}`} */}
             {/* <img width='30rem' height='30rem' style={{borderRadius:'50%',marginRight:'0.5rem'}} src={details.profilePicture}></img> */}
             <Avatar src={details.profilePicture}></Avatar>
             </Link></div></IconButton>:<Link style={{textDecoration:'None',color:'white',textAlign:'center'}} to='/signup'>SignUp</Link>}
@@ -349,7 +349,7 @@ function App() {
         {/* <Route path="/">
           <Redirect to='/signup'/></Route> */}
           <Route path='/user'>{!details?<></>:<div><User/><Feed /></div>}</Route>
-          <Route path='/feed'>{!details?<></>:<Feed />}</Route>
+          <Route exact path='/'>{!details?<></>:<Feed />}</Route>
           {/* <Route path='/chat'>{!details?<></>:<Chat/>}</Route> */}
           <Route path='/chat'>{!details?<></>:<Chat setupdate={setupdate}update={update}/>}</Route>
           <Route path='/users/:id' >{!details?<></>:<><User/><Feed/></>}</Route>

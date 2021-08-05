@@ -8,7 +8,7 @@
 //     async function handleSubmit(e)
 //     {   
 //         e.preventDefault();
-//         const resp= await fetch('http://localhost:8000/auth/signup',{
+//         const resp= await fetch('https://interact-9535.herokuapp.com/auth/signup',{
 //             method:'POST',
 //             body: JSON.stringify({username:username,email:email,password:password}),
 //             headers:{'Content-Type':'application/json','Accept':'application/json'}
@@ -65,7 +65,7 @@ export default function Login()
     async function handleSubmit(e)
     {   
         e.preventDefault();
-        const resp= await fetch('http://localhost:8000/auth/signup',{
+        const resp= await fetch('https://interact-9535.herokuapp.com/auth/signup',{
             method:'POST',
             body: JSON.stringify({username:username,email:email,password:password,profilePicture:dp,coverPicture:cover,city:city,bio:bio}),
             headers:{'Content-Type':'application/json'}

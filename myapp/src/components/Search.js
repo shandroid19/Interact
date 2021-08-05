@@ -62,7 +62,7 @@ export default function SearchComponent()
     useEffect(()=>{
         console.log(user)
         
-        fetch('http://localhost:8000/user/get?key='+user,{
+        fetch('https://interact-9535.herokuapp.com/user/get?key='+user,{
         method:'GET',
         headers:{'Content-Type':'application/json'}
     }).then((resp)=>{return resp.json()}).then((res)=>setusers(res))
@@ -78,7 +78,10 @@ export default function SearchComponent()
     autoHighlight
     getOptionLabel={(option) => option.username}
     renderOption={(object) => (
-        <ButtonBase style={{padding:0,height:'100%',width:'100%'}} onClick={()=>{history.push('/users/'+object.userId);window.location.reload()}}>
+        <ButtonBase style={{padding:0,height:'100%',width:'100%'}} onClick={()=>{
+          history.push('/users/'+object.userId);
+          // window.location.reload()
+          }}>
         <CardHeader style={{padding:0}} avatar={ <img width='30rem' height='30rem' style={{borderRadius:'50%'}} src={object.profilePicture}></img>} title={object.username}>
         </CardHeader>
         </ButtonBase>

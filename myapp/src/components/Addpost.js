@@ -132,7 +132,7 @@
 //     {   
 //         e.preventDefault();  
                
-//         fetch('http://localhost:8000/posts/',{
+//         fetch('https://interact-9535.herokuapp.com/posts/',{
 //             method:'PUT',
 //             headers:{'Content-Type':'application/json','Authorization':context.tok},
 //             body: JSON.stringify({caption:cap.current.value, image:img}),
@@ -227,14 +227,14 @@ import {useGoogleLogin} from 'react-google-login'
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
-import Typography from '@material-ui/core/Typography';
+// import Typography from '@material-ui/core/Typography';
 import AddCircle from '@material-ui/icons/AddCircle';
 import { CircularProgress, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 export default function Addpost()
-{
+{ 
     const clientId='504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com'
     const {signIn} = useGoogleLogin({client_id:clientId})
     const [loading,setloading] = useState(false)
@@ -272,7 +272,7 @@ export default function Addpost()
     function handleSubmit(e)
     {   
         e.preventDefault();            
-        fetch('http://localhost:8000/posts/',{
+        fetch('https://interact-9535.herokuapp.com/posts/',{
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
             body: JSON.stringify({caption:cap.current.value, image:img}),
@@ -308,21 +308,27 @@ export default function Addpost()
                     style={{width:'100%',padding:'1rem'}}
                     inputRef={cap}
                     label="Caption"
-                    fullwidth
                     multiline
                     rows={4}
                     />
                     </Grid>
                     <Grid item >
-                     <label>Upload image </label>
-                     <input 
+                     {/* <Button onClick={(e)=>{
+                          e.preventDefault();
+                          document.getElementById('file').trigger('click');
+                     }} variant='outlined' color='secondary' for='file'>Upload image 
+                     </Button>               
+                     <input id='file'
                     type="file"
+                    hidden
                     //  value={selectedFile}            
                      onChange={uploadImage}
-                      />                 
+                      />   */}
+                      <input type="file" hidden onChange={uploadImage} id="file" /> 
+                        <label for="file">click here to upload image</label>
                       </Grid>
                  <div>
-                 {loading?<CircularProgress/>:
+                 {loading?<div style={{justifyContent:'center',display:'flex'}}><CircularProgress/></div>:
                  img?    <div style={{width:'100%',display:'flex', justifyContent:'center'}}>
                  <img style={{objectFit:'contain',maxHeight:'30rem',width:'100%'}} src={img}/>
                 </div>:<></>}
