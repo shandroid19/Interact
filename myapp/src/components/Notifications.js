@@ -110,7 +110,7 @@ const not = alerts.map((item)=>{
                 {value==0?<div>{req.length===0?
                 <Grid  container direction='column' justify='center' alignItems='center'>
                       {loading?
-                      <Grid item style={{width:'100%'}} >
+                      <Grid item style={{width:'100%',justifyContent:'center'}} >
                         <CircularProgress disableShrink />
 
                       </Grid>

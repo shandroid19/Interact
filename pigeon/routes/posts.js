@@ -88,8 +88,9 @@ router.route('/:id/posts')
 .get(cors.corsWithOptions,async (req, res) => {
   const userid = await authenticate(req.headers.authorization)
     // console.log(req.headers.authorization)
+    User.findOne({userId:userid}).then((privacy)=>{
     Details.findOne({userId:userid},'followings').then((data)=>{
-    if(data.followings.indexOf(req.params.id)!==-1){
+    if(data.followings.indexOf(req.params.id)!==-1 || privacy.private===false){
     Post.find({userId:req.params.id}).countDocuments().then((len)=>{
       const page = parseInt(req.query.p)
       Post.find({userId:req.params.id}).sort({"createdAt":-1}).skip(page*3-3).limit(3).then((posts)=>{
@@ -117,6 +118,7 @@ router.route('/:id/posts')
     res.setHeader('Content-Type','application/json')
     res.json({posts:[],pages:0})
   })
+})
 
 
 // })
