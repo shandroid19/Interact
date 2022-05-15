@@ -7,50 +7,68 @@ import Container from '@material-ui/core/Container'
 import { useEffect, useState } from 'react'
 import InputBase from '@material-ui/core/TextField'
 import {makeStyles,fade} from '@material-ui/core/Styles'
-import Search from '@material-ui/icons/Search'
+// import {Search as SearchIcon} from '@material-ui/icons/Search'
 import {useHistory} from 'react-router-dom'
+import Search from './Search'
+import {Search as SearchIcon} from '@material-ui/icons'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import Button from '@material-ui/core/Button'
 
 const useStyles = makeStyles((theme) => ({
-    search: {
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.4),
-        '&:hover': {
-          backgroundColor: fade(theme.palette.common.white, 0.2),
-        },
-        marginRight: theme.spacing(2),
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-          marginLeft: theme.spacing(3),
-          width: 'auto',
-        },
-      },
-      searchIcon: {
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      inputRoot: {
-        color: 'inherit',
-      },
-      inputInput: {
-        padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
-        paddingLeft: `calc(2em + ${theme.spacing(5)}px)`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-          width: '20ch',
-        },
-      },
-  }));
+ 
+  grow: {
+    flexGrow: 1,
+  },
+  // menuButton: {
+  //   marginRight: theme.spacing(2),
+  // },
+  title: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+    },
+  },
+  search: {
+    width:'15rem',
+    marginLeft:theme.spacing(1),
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    // marginRight: theme.spacing(2),
+    // marginLeft: 0,
+    width: 'auto',
+    [theme.breakpoints.up('sm')]: {
+      // marginLeft: theme.spacing(3),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0,1,0,2),
+    height: '100%',
+    // position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}));
 export default function SearchComponent()
 {
     const history = useHistory()
@@ -69,7 +87,55 @@ export default function SearchComponent()
     
 },[user])
     const objects = users?.map((object)=>{return(object)})
-    return(<div >
+    return( <div style={{width:'100%',display:'flex',alignItems:'center'}}>
+           <div className={classes.searchIcon}>
+  <SearchIcon/>
+ </div>
+    <Autocomplete
+id="autocmplete-clickable"
+style={{ color:'white' }}
+options={objects}
+
+autoHighlight
+getOptionLabel={(option) => option.username}
+renderOption={(object) => (
+    <ButtonBase style={{padding:0,height:'100%',width:'100%'}} onClick={()=>{
+      history.push('/users/'+object.userId);
+      }}>
+      <Grid container>
+        <Grid item>
+    <CardHeader style={{padding:0,width:'100%',height:'100%'}} avatar={ <img width='30rem' height='30rem' style={{borderRadius:'50%'}} src={object.profilePicture}></img>} title={object.username}>
+    </CardHeader>
+      </Grid>
+    </Grid>
+
+    </ButtonBase>
+)}
+renderInput={(params) => (
+  <div  className = {classes.search}>
+
+    <InputBase
+       placeholder=" Search…"
+       style={{color:'white',width:'15rem'}}
+       onChange={(e)=>{console.log(user)
+        setuser(e.target.value)}}
+     {...params}
+    inputProps={{
+      ...params.inputProps,
+    
+       // disable autocomplete and autofill
+    }}
+   />
+  </div>
+
+)}
+/>
+</div> 
+    )
+}
+
+
+{/* <div >
         <Autocomplete
     id="autocmplete-clickable"
     style={{ color:'white' }}
@@ -87,18 +153,7 @@ export default function SearchComponent()
         </CardHeader>
           </Grid>
         </Grid>
-        {/* <Card style={{width:'100%'}}>
-          <Grid container>
-            <Grid item xs={4}>
-          <Avatar src={object.profilePicture}/>
-          </Grid>
-          <Grid item xs={8}>
-            <Typography>
-            {object.username}
-            </Typography>
-            </Grid>
-          </Grid>
-        </Card> */}
+
         </ButtonBase>
     )}
     renderInput={(params) => (
@@ -122,5 +177,4 @@ export default function SearchComponent()
 
     )}
   />
-    </div>)
-}
+    </div> */}

@@ -123,8 +123,8 @@ export default function Chat({setupdate,update})
                 headers:{'Content-Type':'application/json','Authorization':context.tok},
             }).then((resp)=>{return resp.json()})
             .then((res)=>{
-            if(chatid){setunread(res.unread)} else {setchats(res.conversations);console.log(res.conversations)}
-            })
+            if(chatid){setunread(res.unread)} else {setchats(res.conversations);}
+            }).catch((err)=>{setchats([])})
         
         
         setupdate(!update)
@@ -228,7 +228,7 @@ export default function Chat({setupdate,update})
             </Grid>
 
             <Grid item xs={3}>
-            {unread?.indexOf(item.userId)!==-1?<Badge color="primary" overlap="circle" color='secondary' variant='dot' badgeContent=" ">
+            {unread?.indexOf(item.userId)!==-1?<Badge color="primary" overlap="circle"  variant='dot' badgeContent=" ">
             </Badge>:<></>}
             </Grid>
             </Grid>
@@ -331,7 +331,7 @@ return (<>
                                 </IconButton>
                             </Grid>
                             <Grid item xs={1}>
-                                <IconButton id='text' id='sendButton' onClick={sendmessage} variant="contained" color="primary">
+                                <IconButton  id='sendButton' onClick={sendmessage} variant="contained" color="primary">
                                     <SendRoundedIcon/>
                                 </IconButton>
                             </Grid>

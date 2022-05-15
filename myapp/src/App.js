@@ -4,7 +4,8 @@ import SearchComponent from './components/Search'
 import Notifications from './components/Notifications'
 import SinglePost from './components/SinglePost';
 import './App.css'
-
+import {Menu,InputBase,MenuItem,Box} from '@material-ui/core'
+import {Mail,More,AccountCircle} from '@material-ui/icons'
 import {Badge,Grid,CssBaseline,AppBar,Avatar,Toolbar,IconButton,Typography,Container,Button} from '@material-ui/core'
 import Feed from './components/Feed'
 import User from './components/User'
@@ -21,8 +22,12 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
+import Navbar from './components/Navbar'
 import { useState,createContext,useEffect } from "react";
-import { ThemeProvider, createMuiTheme} from "@material-ui/core/styles";
+import { ThemeProvider, createMuiTheme, makeStyles, fade} from "@material-ui/core/styles";
+import { compose, spacing, palette, styleFunctionSx,display } from '@material-ui/system';
+import MailIcon from '@material-ui/icons/Mail';
+import MoreIcon from '@material-ui/icons/MoreVert';
 
 
 
@@ -91,8 +96,82 @@ function App() {
       getresp()
     }
   },[tok,details,update])
+  
+const useStyles = makeStyles((theme) => ({
+  grow: {
+    flexGrow: 1,
+  },
+  title:{
+    marginRight:theme.spacing(1),
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(3),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+  sectionDesktop: {
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+    display: 'flex',
+    },
+  },
+  sectionMobile: {
+    display: 'flex',
+    [theme.breakpoints.up('md')]: {
+      display: 'none',
+    },
+  },
+  avatarSmall:{
+    height:theme.spacing(4),
+    width:theme.spacing(4)
+  },
+}));
+
+const classes = useStyles();
 
 
+  
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const logout = ()=>{console.log('logged out');window.location.reload();}
   async function getresp(){
@@ -114,8 +193,116 @@ function App() {
         console.log('user not found')
       }
   }
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleprofile = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+    history.push(`/users/${details.userId}`)
+  };
+
+  const handlechat= () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+    history.push(`/users/${details.userId}`)
+  };
+
+
+  const handleMobileMenuOpen = (event) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const menuId = 'primary-search-account-menu';
+  // const renderMenu = (
+  //   <Menu
+  //     anchorEl={anchorEl}
+  //     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+  //     id={menuId}
+  //     keepMounted
+  //     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+  //     open={isMenuOpen}
+  //     onClose={handleMenuClose}
+  //   >
+  //     <MenuItem onClick={handleprofile}>Profile</MenuItem>
+  //     <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+  //   </Menu>
+  // );
+
+  const mobileMenuId = 'primary-search-account-menu-mobile';
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem onClick={()=>history.push('/chat')}>
+           <IconButton onClick={()=>history.push('/chat')}>
+           {!details?.unreadchats?
+          <ChatIcon/>:
+           <Badge color='secondary' badgeContent={unread}>
+           <ChatIcon />
+           </Badge>}
+           </IconButton>
+           <p>Messages</p>
+          </MenuItem>
+          <MenuItem onClick={()=>history.push('/notification')}>
+           <IconButton onClick={()=>history.push('/notification')}>
+           {!details?.notifications?
+           <NotificationsIcon/>:
+           <Badge color='secondary' badgeContent={details.notifications}>
+          <NotificationsIcon />
+          </Badge>}
+           </IconButton>
+           <p>Notifications </p>
+           </MenuItem>
+              <MenuItem onClick={handleprofile}>
+              {details?<><IconButton >
+      
+           <Avatar src={details.profilePicture} className={classes.avatarSmall}></Avatar>
+           </IconButton><p>Account</p></>:<Link style={{textDecoration:'None',color:'white',textAlign:'center',display:'flex'}} to='/signup'>SignUp</Link>}
+
+      </MenuItem>
+      <MenuItem >
+      <IconButton>
+{user?
+ <div>
+  <GoogleLogout
+  clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
+  buttonText="Logout"
+  render={renderProps => (
+    <Button  variant='contained' color='secondary' onClick={renderProps.onClick}>
+     Logout
+    </Button>
+   )} 
+  onLogoutSuccess={logout}>
+  </GoogleLogout>
+  </div>
+ :<div>
+<></>
+</div>
+}
+</IconButton>
+      </MenuItem>
+    </Menu>
+  );
+
+
+
+
   const history = useHistory();
 
+  
   // const onSuccess = res=>{
   // window.gapi?.load('auth2',()=>{
   //       window.gapi.auth2.init({
@@ -169,45 +356,47 @@ function App() {
     typography:{
       fontFamily:["Armata",'sans-serif',"Encode Sans","sans-serif","Questrial",'sans-serif'],
       h5:{
-      fontFamily: ["Audiowide", 'sans-serif'].join(',')
+      fontFamily: ["Questrial", 'sans-serif'].join(',')
       },
       h6:{
-        fontFamily: ["Encode Sans","sans-serif","Questrial",'sans-serif'].join(',')
+        fontFamily: ["Questrial",'sans-serif'].join(',')
          
       },
     },
     palette: {
-      type:'dark',
+      type:'light',
       primary: 
       {
         // main:'#8f00ff', //violet
         // main:'#05Ce91', //green 
         // main:'#1EA5Fc', //blue
-        main:"#ff385d",
-        mainGradient: "linear-gradient(to right,#ff385d, #3541b5)",
-        ultamainGradient: "linear-gradient(to left,#ff385d, #3541b5)",
-        contrastText: '#fff',
-        text: 'white'
+        // main:"#ff385d",
+        main:'#a6dcf7',
+        card:"#edebeb",
+        // mainGradient: "linear-gradient(to right,#ff385d, #3541b5)",
+        // ultamainGradient: "linear-gradient(to left,#ff385d, #3541b5)",
+        contrastText: '#000000',
+        text: '#000000'
       },
       secondary: {
-        light: '#0066ff',
-        main: '#3541b5',
-        contrastText: '#ffff',
+        light: '#e8e8e8',
+        main: '#e6e6e6',
+        contrastText: '#000000',
       },
       info:{
-        main:'#4103fc',
-        light: '#0066ff',
-        contrastText: '#ffff',
+        main:'#e0e0e0',
+        light: '#e8e8e8',
+        contrastText: '#00000',
       },
       background:{
-        default:'#142057',
+        default:'#edebeb',
         // default:'#d6e9ff', //blue
         // default:'#d4bdff', //violet
         // default:'#f7f0c8', //green
         // paper:'#d4ffdc',
         // paper:'#70cefa'//prev
-        paper:'#ff385d',
-        contrastText: '#ffff',
+        paper:'#f0f9fa',
+        contrastText: '#000000',
         
 
       },
@@ -246,10 +435,10 @@ function App() {
     typography:{
       fontFamily:["Armata",'sans-serif',"Encode Sans","sans-serif","Questrial",'sans-serif'],
       h5:{
-      fontFamily: ["Audiowide", 'sans-serif'].join(',')
+      fontFamily: ["Questrial", 'sans-serif'].join(',')
       },
       h6:{
-        fontFamily: ["Encode Sans","sans-serif","Questrial",'sans-serif'].join(',')
+        fontFamily: ["Questrial",'sans-serif'].join(',')
          
       },
     },
@@ -261,6 +450,7 @@ function App() {
         // main:'#8f00ff', //violet
         main:'#383838', //green
         // main:'#1EA5Fc', //blue
+        card:'black',
         text: 'white',
         contrastText: '#fff',
       },
@@ -286,116 +476,183 @@ function App() {
     },
   });
 
+
+
   return (
     < ThemeProvider theme={details?.darkmode?darktheme:lightheme}>
     <AuthContext.Provider value={{user,setuser,setok,setdetails,tok,details}}>
     <CssBaseline/>
-    <Router >
+    {/* <Router > */}
     <Switch> 
       <>
-          {!details?<></>:<AppBar position='static'>
-        <Toolbar>
-            <Container>
-          <Grid container justify='flex-end' alignItems='center'>
-            <Grid item lg={8} md={7} xs={12}>
-              <Grid container justify='center'>
-                <Grid item xs={5}>
-                  <Grid container>
-                    <Grid item>
-          <Link style={{textDecoration:'none'}} to='/'>
-          <Typography color='textPrimary' variant="h5">
-          Interact
-          </Typography>
-          </Link>
-          </Grid>
-          </Grid>
-          </Grid>
-          <Grid item xs={7}>
-            <Grid container justify='flex-start'>
-              <Grid id='grr' item xs={12}>
-            <div><SearchComponent/></div>
-            </Grid>
-            </Grid>
-            </Grid>
+          {!details?<></>:
+        //   <AppBar position='static'>
+        // <Toolbar>
+        //     <Container>
+        //   <Grid container justify='flex-end' alignItems='center'>
+        //     <Grid item lg={8} md={7} xs={12}>
+        //       <Grid container justify='center'>
+        //         <Grid item xs={5}>
+        //           <Grid container>
+        //             <Grid item>
+        //   <Link style={{textDecoration:'none'}} to='/'>
+        //   <Typography color='textPrimary' variant="h5">
+        //   Interact
+        //   </Typography>
+        //   </Link>
+        //   </Grid>
+        //   </Grid>
+        //   </Grid>
+        //   <Grid item xs={7}>
+        //     <Grid container justify='flex-start'>
+        //       <Grid id='grr' item xs={12}>
+        //     <div><SearchComponent/></div>
+        //     </Grid>
+        //     </Grid>
+        //     </Grid>
 
-          </Grid>
-            </Grid>
+        //   </Grid>
+        //     </Grid>
 
 
           
-         <Grid item lg={4} md={5} xs={12} >
-           <Grid container justify='center' alignItems='center' >
-
-          <Grid item xs={2}>  
-          {details && !signin?<Link style={{textDecoration:'None'}} to='/'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
-          </Grid>   
-          <Grid item xs={2}>   
-        <Link style={{textDecoration:'None'}} to='/chat'  >
-          <IconButton>
-          {!details?.unreadchats?
-          <ChatIcon/>:
-          <Badge color='secondary' badgeContent={unread}>
-          <ChatIcon />
-          </Badge>}
-          </IconButton>
-          </Link>
-          </Grid>
-          <Grid item xs={2}>    
-          <Link  style={{textDecoration:'None'}} to='/notification'>
-            <IconButton>
-          {!details?.notifications?
-          <NotificationsIcon/>:
-          <Badge color='secondary' badgeContent={details.notifications}>
-          <NotificationsIcon />
-          </Badge>}
-          </IconButton>
-          </Link>
-          </Grid>
-          <Grid item xs={2} >    
-          {details?<IconButton ><div><Link to={`/users/${details.userId}`} style={{textDecoration:'None',textAlign:'center'}} color='textPrimary'>
-          {/* to={`/users/${details.userId}`} */}
-            {/* <img width='30rem' height='30rem' style={{borderRadius:'50%',marginRight:'0.5rem'}} src={details.profilePicture}></img> */}
-            <Avatar src={details.profilePicture}></Avatar>
-            </Link></div></IconButton>:<Link style={{textDecoration:'None',color:'white',textAlign:'center'}} to='/signup'>SignUp</Link>}
+        //  <Grid item lg={4} md={5} xs={12} >
+        //   <div className={classes.hidebox}>
+        //   <Grid container justify='center' alignItems='center' >
+        //   <Grid item xs={2}>  
+        //   {details && !signin?<Link style={{textDecoration:'None'}} to='/'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
+        //   </Grid>   
+        //   <Grid item xs={2}>   
+        // <Link style={{textDecoration:'None'}} to='/chat'  >
+        //   <IconButton>
+        //   {!details?.unreadchats?
+        //   <ChatIcon/>:
+        //   <Badge color='secondary' badgeContent={unread}>
+        //   <ChatIcon />
+        //   </Badge>}
+        //   </IconButton>
+        //   </Link>
+        //   </Grid>
+        //   <Grid item xs={2}>    
+        //   <Link  style={{textDecoration:'None'}} to='/notification'>
+        //     <IconButton>
+        //   {!details?.notifications?
+        //   <NotificationsIcon/>:
+        //   <Badge color='secondary' badgeContent={details.notifications}>
+        //   <NotificationsIcon />
+        //   </Badge>}
+        //   </IconButton>
+        //   </Link>
+        //   </Grid>
+        //   <Grid item xs={2} >    
+        //   {details?<IconButton ><div><Link to={`/users/${details.userId}`} style={{textDecoration:'None',textAlign:'center'}} color='textPrimary'>
+      
+        //     <Avatar src={details.profilePicture}></Avatar>
+        //     </Link></div></IconButton>:<Link style={{textDecoration:'None',color:'white',textAlign:'center'}} to='/signup'>SignUp</Link>}
           
-          </Grid>
-          <Grid item > 
-          <IconButton>
-        {user?
-         <div>
-          <GoogleLogout
-          clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
-          buttonText="Logout"
-          render={renderProps => (
-            <Button  variant='contained' color='secondary' onClick={renderProps.onClick}>
-             Logout
-            </Button>
-           )} 
-          onLogoutSuccess={logout}>
-          </GoogleLogout>
-          </div>
-         :<div>
-         {/* <GoogleLogin
-        clientId={clientId}
-        redirectUri={'/'}
-        buttonText="Login"
-        onSuccess={onSuccess}
-        cookiePolicy={'single_host_origin'}
-        isSignedIn={true}></GoogleLogin> */}
-        <></>
-        </div>
-        }
-        </IconButton>
-        {/* </MenuItem> */}
-        </Grid>
-        </Grid>
-        </Grid> 
+        //   </Grid>
+        //   <Grid item > 
+        //   <IconButton>
+        // {user?
+        //  <div>
+        //   <GoogleLogout
+        //   clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
+        //   buttonText="Logout"
+        //   render={renderProps => (
+        //     <Button  variant='contained' color='secondary' onClick={renderProps.onClick}>
+        //      Logout
+        //     </Button>
+        //    )} 
+        //   onLogoutSuccess={logout}>
+        //   </GoogleLogout>
+        //   </div>
+        //  :<div>
+        // <></>
+        // </div>
+        // }
+        // </IconButton>
+        // </Grid>
+        // </Grid>
+        // </div> 
+        // </Grid> 
+        
  
           
-          </Grid>
-          </Container>
+        //   </Grid>
+        //   </Container>
+        //   </Toolbar>
+        // </AppBar>
+        // <Navbar></Navbar>
+        <div className={classes.grow}>
+        <AppBar position="static">
+          <Toolbar>
+             <Link style={{textDecoration:'none'}} to='/'>
+           <Typography color='textPrimary' className={classes.title} variant="h5">
+           Interact
+          </Typography>
+           </Link>
+            <div className={classes.search}>
+              <SearchComponent/>
+            </div>
+            <div className={classes.grow} />
+            <div className={classes.sectionDesktop} style={{alignItems:'center'}}>
+           <IconButton onClick={()=>history.push('/chat')}>
+           {!details?.unreadchats?
+          <ChatIcon/>:
+           <Badge color='secondary' badgeContent={unread}>
+           <ChatIcon />
+           </Badge>}
+           </IconButton>
+
+           <IconButton onClick={()=>history.push('/notification')}>
+           {!details?.notifications?
+           <NotificationsIcon/>:
+           <Badge color='secondary' badgeContent={details.notifications}>
+          <NotificationsIcon />
+          </Badge>}
+           </IconButton>
+
+              {details?<IconButton ><div><Link to={`/users/${details.userId}`} style={{textDecoration:'None',textAlign:'center'}} color='textPrimary'>
+      
+           <Avatar src={details.profilePicture} className={classes.avatarSmall}></Avatar>
+           </Link></div></IconButton>:<Link style={{textDecoration:'None',color:'white',textAlign:'center'}} to='/signup'>SignUp</Link>}
+            <IconButton>
+
+         {user?
+          <div>
+           <GoogleLogout
+           clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
+           buttonText="Logout"
+           render={renderProps => (
+             <Button  variant='contained' color='secondary' onClick={renderProps.onClick}>
+              Logout
+             </Button>
+            )} 
+           onLogoutSuccess={logout}>
+           </GoogleLogout>
+           </div>
+          :<div>
+         <></>
+         </div>
+         }
+         </IconButton>
+        </div>
+            <div className={classes.sectionMobile}>
+              <IconButton
+                aria-label="show more"
+                aria-controls={mobileMenuId}
+                aria-haspopup="true"
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+            </div>
           </Toolbar>
         </AppBar>
+        {renderMobileMenu}
+        {/* {renderMenu} */}
+      </div>
         }
         <Route path="/signup">
           <GLogin/>
@@ -415,7 +672,7 @@ function App() {
           </>
       </Switch>
       
-    </Router>
+    {/* </Router> */}
     </AuthContext.Provider>
     </ ThemeProvider>
   );

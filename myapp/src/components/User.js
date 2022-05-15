@@ -265,8 +265,7 @@ useEffect(() => {
 const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollowings(false)}>
 <DialogTitle style={{paddingBottom:0}}><Typography>Following</Typography></DialogTitle>
 <DialogContent style={{height:'60vh'}}>
-{ followings.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}>
-<Grid><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+{ followings.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><Grid container><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
 </CardHeader></Grid></ButtonBase>})}
 <div ref={followingsloader}></div>
 </DialogContent>
@@ -282,12 +281,12 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
         
         <Grid container justify='center' alignItems='center'>
   <Grid item  lg={7} md={9} sm={10}>
-  <Box boxShadow={20} style={{margin:'1rem'}}  boxshadow={20}>
-  <Card style={{background: theme.palette.primary.mainGradient}} >
+  <Box elevation={0} style={{margin:'1rem',border:'none'}}>
+  <Card elevation={0}  style={{background: theme.palette.primary.card}} >
       <CardContent>
           <Grid container justify='center' alignItems='center' spacing={4}>
                  <Grid item xs={3} md={2}>
-                 {loading?<CircularProgress/>:<img style={{width:'100%'}} src={dp}/>}
+                 {loading?<CircularProgress/>:<img style={{width:'100%',borderRadius:'50%'}} src={dp}/>}
                <input  onChange={uploadImage} accept="image/*" id='inputpic' type='file' hidden/> 
                  <label htmlFor='inputpic'>       
                <Button variant='contained' style={{marginTop:'1rem'}} color='primary' component='span'>upload</Button>
@@ -349,20 +348,20 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
         {followingsdialog}
         <Grid container justify='center' alignItems='center'>
   <Grid item lg={7} md={9} sm={10}>
- <Box boxShadow={20} style={{margin:'1rem'}}> 
 
-  <Card style={{background: theme.palette.primary.mainGradient}}  >
-  
+ <Box elevation={0} style={{margin:'1rem',border:'none'}}> 
+
+  <Card elevation={0} style={{background: theme.palette.primary.card}}  >
 
       <CardContent>
           <Grid  container justify='center' alignItems='center' spacing ={4}>
           <Grid item xs={3} md={2}>
-              <img style={{width:'100%'}} src={details.profilePicture}/>
+              <img style={{width:'100%',borderRadius:'50%'}} src={details.profilePicture}/>
           </Grid>
       <Grid item xs={9} md={10}>
           <Grid container >
               <Grid item xs={12}>
-                 <Typography variant='h6'>{details.username}</Typography>
+                 <Typography variant='h5'>{details.username}</Typography>
               </Grid>
               <Grid item xs={12}>
               <Typography>{details.name}</Typography>
@@ -370,10 +369,10 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
               <Grid item xs={12}>
               <Typography>{details.city}</Typography>
               </Grid>
-              <Grid item  sm={5} xs={12}>
+              <Grid item  sm={4} xs={6}>
                 <a onClick={getfollowers}><Typography>Followers : {details.followers.length-1}</Typography></a>
               </Grid>
-              <Grid item sm={5} xs={12}>
+              <Grid item sm={4} xs={6}>
                 <a onClick={getfollowings}><Typography>Following : {details.followings.length-1}</Typography></a>
               </Grid>
               <Grid item xs={12}>
@@ -382,7 +381,7 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
               <Grid item xs={6} style={{marginTop:'1rem'}}>
                   <Grid container>
 <div style={{width:'100%'}}>{
-context.user.googleId===id?<Grid item xs={6}><Button variant='outlined' onClick={setEdit}>Edit profile</Button></Grid>:  
+context.user.googleId===id?<Grid item md={6} xs={12}><Button variant='outlined' onClick={setEdit}>Edit profile</Button></Grid>:  
 <div >
         
 { details.requests.indexOf(context.user.googleId)===-1?

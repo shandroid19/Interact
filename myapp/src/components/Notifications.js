@@ -83,8 +83,8 @@ const not = alerts.map((item,index)=>{
       }}
       showLabels
     >
-      <BottomNavigationAction label={requests.length?<b>Requests</b>:<p>Requests</p>}/>
-      <BottomNavigationAction label={requests.length?<b>Notifications</b>:<p>Notifications</p>}/>
+      <BottomNavigationAction label={requests.length?<Typography variant='body2'>Requests</Typography>:<Typography variant='body2'>Requests</Typography>}/>
+      <BottomNavigationAction label={requests.length?<Typography variant='body2'>Notifications</Typography>:<Typography variant='body2'>Notifications</Typography>}/>
     </BottomNavigation>
     </Grid>
                 <Grid item xs={12}>
