@@ -1,24 +1,26 @@
 import {useContext,useEffect,useState,useRef} from 'react'
 import {Typography,IconButton,Popover,Grid,Card,CardHeader,Avatar,CardContent,Box,ButtonBase,TextField,Badge} from '@material-ui/core'
-import {EmojiEmotions,ArrowBackIos,DeleteForeverOutlined} from '@material-ui/icons'
+import {EmojiEmotions,ArrowBackIos} from '@material-ui/icons'
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import { AuthContext } from '../App'
 import {useGoogleLogin} from 'react-google-login'
 import Picker from 'emoji-picker-react'
 import { useHistory,useLocation } from 'react-router-dom';
 import {format} from 'timeago.js'
+import { useTheme } from '@material-ui/styles';
 import {io} from 'socket.io-client'
 import Skeleton from '@material-ui/lab/Skeleton'
 
 export default function Chat({setupdate,update})
 {
-    // const socket = io("ws://localhost:8900")
+    // const socket = io("ws://localhost:8900") 
     const clientId='504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com'
     const {signIn} = useGoogleLogin({client_id:clientId})
     
     function useQuery() {
         return new URLSearchParams(useLocation().search);
       } 
+    const theme = useTheme();
     const query = useQuery()
     const chatid = query.get("id")
     const history = useHistory();
@@ -41,7 +43,7 @@ export default function Chat({setupdate,update})
     const [init,setinit] = useState(false)
     const [unread,setunread] = useState([])
     const [loading,setloading] = useState(false)
-    const [del,setdel] = useState('')
+
 
 
     useEffect(()=>{
@@ -51,7 +53,6 @@ export default function Chat({setupdate,update})
         fetch('https://interact-9535.herokuapp.com/chats'+(chatid?`?id=${chatid}&p=${page}`:''),{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
-        // }).then((resp)=>{return resp.json()}).then((res)=>{setchats(res);if(chatid)setuser(res)})
         }).then((resp)=>{return resp.json()})
         .then((res)=>{
         if(chatid){setuser(res);scrollRef.current?.scrollIntoView({ behavior: "auto" }); }
@@ -62,7 +63,6 @@ export default function Chat({setupdate,update})
      },[window.gapi,chatid]) 
 
     useEffect(()=>{
-        // socket.current = io('https://interact-3d602.web.app/')
         socket.current = io('https://interactchat-9535.herokuapp.com/')
         socket.current.on('getMessage',data=>{
             setincoming({
@@ -111,7 +111,6 @@ export default function Chat({setupdate,update})
             headers:{'Content-Type':'application/json','Authorization':context.tok},
         }).then((resp)=>{return resp.json()})
         .then((res)=>{
-            // setupdate(update)
             if(!chatid)
             {
             setunread(res.unread)
@@ -129,12 +128,11 @@ export default function Chat({setupdate,update})
         
         
         setupdate(!update)
-    },[incoming,user])
+    },[incoming,user,chatid])
 
      useEffect(()=>{
-        // if(init && page>1)
-        // {
-            if(max>=page &&user){
+        if(max>=page &&user){
+
         fetch('https://interact-9535.herokuapp.com/chats/'+user.conversationId+`?id=${chatid}&p=${page}`,{
             method:'GET',
             headers:{'Content-Type':'application/json','Authorization':context.details.tok},
@@ -150,7 +148,6 @@ export default function Chat({setupdate,update})
             }
             setmax(res.pages)})
     }
-// }
     },[user,page])
     useEffect(()=>{
         if(context.details.userId)
@@ -207,8 +204,12 @@ export default function Chat({setupdate,update})
             chats
             .map((item,index)=>{ return <Grid item key={index} xs={12}>
             <ButtonBase onClick = {()=>history.push(`?id=${item.userId}`)} style={{width:'100%'}}>
+            <Grid container alignItems='center'>
+            <Grid item xs={9}>
+            <Grid container> 
+            <Grid item>
             <CardHeader avatar={onlineusers.find((it)=>{return it.userId===item.userId})?
-            <Badge color="primary" overlap="circle" variant='dot' badgeContent=" ">
+            <Badge color="secondary" overlap="circle" variant='dot' badgeContent=" ">
                         <Avatar src={item.profilePicture}></Avatar>
                         </Badge>:
                         <Avatar src={item.profilePicture}></Avatar>
@@ -218,17 +219,24 @@ export default function Chat({setupdate,update})
                 <Grid item sm={3}>
                     <Typography>{item.username}</Typography>
                     </Grid>
+                    
                 </Grid>}
-            action={unread?.indexOf(item.userId)!==-1?<Badge color="primary" overlap="circle" color='secondary' variant='dot' badgeContent=" ">
-            </Badge>:<></>}
-
             >
-           
             </CardHeader>
+            </Grid>
+            </Grid>
+            </Grid>
+
+            <Grid item xs={3}>
+            {unread?.indexOf(item.userId)!==-1?<Badge color="primary" overlap="circle" color='secondary' variant='dot' badgeContent=" ">
+            </Badge>:<></>}
+            </Grid>
+            </Grid>
+
             </ButtonBase>
         </Grid>}
         ):<Grid container justify='center'>
-{loading?
+    {loading?
                       <Grid item style={{width:'100%'}} >
                           <CardHeader 
                           title={
@@ -248,7 +256,7 @@ export default function Chat({setupdate,update})
 
         const oldmessages = old.map((item,key)=>{
 
-            return <Grid  key={key} item xs={12} onMouseEnter={()=>{setdel('old'+key)}} onMouseLeave={()=>{setdel('')}} > 
+            return <Grid  key={key} item xs={12}  > 
                       <Grid container justify={item.sender==context.details.userId?'flex-end':'flex-start'}>
              <Grid item xs={5}>
                  <Box style={{borderRadius:'1rem'}} bgcolor="primary.main" color="primary.text">
@@ -259,40 +267,22 @@ export default function Chat({setupdate,update})
                       </CardContent>
                   </Box>
               </Grid>
-              {/* {del==='old'+key?<IconButton onClick={()=>{
-                    fetch('https://interact-9535.herokuapp.com/chats/delete?id='+item._id,{
-                        method:'DELETE',
-                        headers:{'Content-Type':'application/json','Authorization':context.details.tok},
-                    })
-                  }} >
-              <DeleteForeverOutlined/>
-            </IconButton>:<></>} */}
               </Grid>
               </Grid>
         })
 
         const message = messages.map((item,key)=>{
-            return <Grid  key={key} item xs={12} onMouseEnter={()=>{setdel('old'+key)}} onMouseLeave={()=>{setdel('')}} > 
+            return <Grid  key={key} item xs={12}  > 
                       <Grid container justify={item.sender==context.details.userId?'flex-end':'flex-start'}>
              <Grid item xs={5}>
                  <Box style={{borderRadius:'1rem'}} bgcolor="primary.main" color="primary.text">
                      
-                     <CardContent onMouseEnter={()=>{setdel('new'+key)}} onMouseLeave={()=>{setdel('')}} style={{padding:'0.5rem'}}>
-                  <Typography variant='subtitle1'>{item.message}</Typography>
+                     <CardContent  style={{padding:'0.5rem'}}>
+                  <Typography  variant='subtitle1'>{item.message}</Typography>
                   <Typography variant='subtitle2' color='textSecondary'>{format(item.createdAt)}</Typography>
                       </CardContent>
                   </Box>
               </Grid>
-              {/* {del==='new'+key?<IconButton onClick={
-                  ()=>{
-                    fetch('https://interact-9535.herokuapp.com/chats/delete?id='+item._id,{
-                        method:'DELETE',
-                        headers:{'Content-Type':'application/json','Authorization':context.details.tok},
-                    })
-                  }
-              }>
-              <DeleteForeverOutlined/>
-            </IconButton>:<></>} */}
               </Grid>
               </Grid>
         })
@@ -302,9 +292,15 @@ return (<>
     <Grid item md={5} xs={12}>
     <Box style={{margin:'1rem'}} boxShadow={22}>
 
-    <Card>
-        <CardContent>
-        {user?<div><Grid container alignItems='center'><Grid item xs={1}><IconButton onClick={()=>{history.push('/chat');setuser(null)}}><ArrowBackIos/></IconButton></Grid><Grid item xs={11}><CardHeader 
+    <Card style={{ background: theme.palette.primary.mainGradient }}>
+        <CardContent style={{overflowY:'scroll'}}>
+        {user?<div><Grid container alignItems='center'><Grid item xs={1}><IconButton onClick={()=>{
+            setold([]);
+            setmessages([]);
+            history.push('/chat');
+            setuser(null)
+        }}>
+        <ArrowBackIos/></IconButton></Grid><Grid item xs={11}><CardHeader 
          avatar={<Avatar src={user.profilePicture}></Avatar>}  title={<Grid container content='flex-start' alignItems='center'><Grid item xs={12}>{user.username}</Grid>{onlineusers?.find(user=>user.userId === chatid)?<Grid item sm={3}>Online</Grid>:<></>}</Grid>} /></Grid></Grid></div>:<></>}
             <div style={{height:'70vh'}}>
             {user?// if user is selected , display the selected user conversation
@@ -314,13 +310,6 @@ return (<>
                     <Grid container style={{height:'100%'}} spacing={1} alignItems='flex-start' direction='row'>
                             
                     <Grid item xs={12}>
-                            {/* <CardContent >
-                            <div style={{height: '55vh',overflowY:'scroll'}}>
-                                <Grid container>
-                                {message}
-                                </Grid>
-                            </div>
-                            </CardContent> */}
                             <div style={{height: '60vh',overflowY:'scroll'}}>
                                 <div ref={loader}></div>
                                 {oldmessages}
@@ -329,7 +318,6 @@ return (<>
                                 <div ref={scrollRef}>
 
                                 </div>
-                                {/* <div ref={scrollRef}></div> */}
                             </div>
                     </Grid>
                     <Grid item xs={12} >

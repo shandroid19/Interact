@@ -2,6 +2,7 @@ import {CircularProgress,Typography,CardHeader,Box,CardContent, ButtonBase,Avata
 import { useState,useContext, useEffect } from 'react'
 import { AuthContext } from '../App'
 import { useHistory } from 'react-router-dom'
+import { useTheme } from '@material-ui/styles'
 
 
 
@@ -9,6 +10,7 @@ export default function Notifications(){
 
 const history = useHistory()
 const context = useContext(AuthContext)
+const theme = useTheme();
 const [requests,setrequests] = useState([])
 const [alerts,setalerts] = useState([])
 const [value,setvalue] = useState(0)
@@ -23,7 +25,6 @@ useEffect(()=>{
             headers:{'Content-Type':'application/json','Authorization':context.tok}
     }).then((resp)=>{return resp.json()})
     .then((res)=>{setmax(res.pages);setrequests(requests.concat(res.requests));setalerts(res.alerts);setloading(false)})
-    //     setrequests(res.requests),setalerts(res.notifications)})
 },[page])
 
 const clear= ()=>{
@@ -31,13 +32,12 @@ const clear= ()=>{
         method:'GET',
         headers:{'Content-Type':'application/json','Authorization':context.tok}
 })
-window.location.reload();
-
+setalerts([])
 }
 
-const req = requests.map((req)=>{
-    return  <ButtonBase onClick={()=>history.push(`users/${req.userId}`)} style={{width:'100%'}} >
-        <CardContent style={{width:'100%',paddingTop:'0'}}>
+const req = requests.map((req,index)=>{
+    return  <ButtonBase key={index} onClick={()=>history.push(`users/${req.userId}`)} style={{width:'100%'}} >
+        <CardContent style={{width:'100%',paddingTop:'0' }}>
             <Grid container alignItems='center' spacing={2}>
                 <Grid item xs={2}>
                     <Avatar src={req.profilePicture}></Avatar>
@@ -45,30 +45,13 @@ const req = requests.map((req)=>{
                 <Grid item xs={4} style={{display:'flex',justifyContent:'left'}}>
                     <b>{req.username}</b>
                 </Grid>
-                <Grid item xs={6} style={{display:'flex',justifyContent:'left'}} >
-                <Button style={{marginRight:'1rem'}} onClick={()=>{
-    fetch('https://interact-9535.herokuapp.com/user/'+req.userId+'/acceptrequest',
-    {
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':context.tok}
-    }).then((resp)=>{console.log(resp.json())})
-    window.location.reload()
-}} variant='contained' color='primary'>Accept</Button>
-                <Button onClick={ ()=>{
-    fetch('https://interact-9535.herokuapp.com/user/'+req.userId+'/rejectrequest',
-    {
-        method:'DELETE',
-        headers:{'Content-Type':'application/json','Authorization':context.tok}
-    }).then((resp)=>{console.log(resp.json())})
-    window.location.reload()
-}} color='info' variant='contained'>Reject</Button>
-                </Grid>
+                
             </Grid>   
         </CardContent>    </ButtonBase> 
 })
-const not = alerts.map((item)=>{
-    return <ButtonBase onClick={()=>{item.id<2?history.push(`/users/${item.userId}`):history.push(`/post/${item.postId}`)}} style={{width:'100%'}} >
-        <CardContent style={{width:'100%',paddingTop:0}}>
+const not = alerts.map((item,index)=>{
+    return <ButtonBase key={index} onClick={()=>{item.id<2?history.push(`/users/${item.userId}`):history.push(`/post/${item.postId}`)}} style={{width:'100%'}} >
+        <CardContent style={{width:'100%',paddingTop:0  }}>
             <Grid container alignItems='center'>
                 <Grid item xs={2}>
                     <Avatar src={item.profilePicture}></Avatar>
@@ -76,7 +59,7 @@ const not = alerts.map((item)=>{
                 <Grid item xs={10} style={{display:'flex',justifyContent:'left'}}>
                     <Typography variant='subtitle2'>{item.username}</Typography>&nbsp;
                     {item.id>1?<Typography variant='subtitle2'>commented on your post : {item.body}</Typography>:
-                    item.id<1?<Typography variant='subtitle2'>accepted your follow request.</Typography>:
+                    item.id==1?<Typography variant='subtitle2'>accepted your follow request.</Typography>:
                     <Typography variant='subtitle2'>started following you</Typography>}
                 </Grid>
             </Grid>   
@@ -84,8 +67,7 @@ const not = alerts.map((item)=>{
         </ButtonBase>
 
    
-    // return <ButtonBase style={{width:'100%'}}><CardHeader avatar={<Avatar src={req.profilePicture}/>} 
-    // title={<Grid container><Grid item sm={12}><b>{req.username}</b></Grid><Grid item sm={12}>{req.body}</Grid></Grid>}></CardHeader></ButtonBase>
+    
 })
     return (<div>
         <Grid style={{marginTop:'5rem'}} container justify='center'>
@@ -94,7 +76,7 @@ const not = alerts.map((item)=>{
 
             <Grid container justify='center'>
             <Grid item xs={12}>
-                <BottomNavigation
+                <BottomNavigation style={{background: theme.palette.primary.mainGradient}}
       value={value}
       onChange={(event, newValue) => {
         setvalue(newValue);
@@ -106,11 +88,11 @@ const not = alerts.map((item)=>{
     </BottomNavigation>
     </Grid>
                 <Grid item xs={12}>
-                <Card style={{width:'100%',height:'60vh',overflowY:'scroll'}}>
+                <Card style={{width:'100%',height:'60vh',overflowY:'scroll',background: theme.palette.primary.mainGradient}}>
                 {value==0?<div>{req.length===0?
                 <Grid  container direction='column' justify='center' alignItems='center'>
                       {loading?
-                      <Grid item style={{width:'100%',justifyContent:'center'}} >
+                      <Grid item xs={12} style={{justifyContent:'center'}} >
                         <CircularProgress disableShrink />
 
                       </Grid>

@@ -3,17 +3,16 @@ import React from 'react';
 import SearchComponent from './components/Search'
 import Notifications from './components/Notifications'
 import SinglePost from './components/SinglePost';
-// import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 
-import {Badge,Grid,CssBaseline,AppBar,Avatar,Toolbar,IconButton,Typography,Container} from '@material-ui/core'
+import {Badge,Grid,CssBaseline,AppBar,Avatar,Toolbar,IconButton,Typography,Container,Button} from '@material-ui/core'
 import Feed from './components/Feed'
 import User from './components/User'
 import GLogin from "./components/GLogin"
 import Chat from './components/Chat' 
 import ChatIcon from '@material-ui/icons/Chat'
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { GoogleLogin,GoogleLogout} from 'react-google-login';
+import { GoogleLogout,useGoogleLogin} from 'react-google-login';
 import {
   useHistory,
   BrowserRouter as Router,
@@ -45,6 +44,22 @@ function App() {
   const notopen = Boolean(null);
   const [unread,setunread] = useState(0)
   // const notid = notopen ? 'not-popper' : undefined;
+  const {signIn} = useGoogleLogin({clientId:clientId,onSuccess:onSuccess,isSignedIn:true})
+  function onSuccess(ob){
+  fetch('https://interact-9535.herokuapp.com/auth/login',{
+    method:'POST',
+    body: JSON.stringify({userId:ob.profileObj.googleId}),
+    headers:{'Content-Type':'application/json','Authorization':ob.tokenObj.id_token}
+ }
+ )
+
+  }
+
+  useEffect(()=>{
+    if(window.gapi)
+       signIn()
+ },[window.gapi])
+
   useEffect(()=>{
     let obj;
     if(window.gapi){
@@ -54,7 +69,6 @@ function App() {
       }).then(()=>{
         obj = window.gapi.auth2.getAuthInstance()
         if(obj.isSignedIn.get()){
-
           let profile = obj.currentUser.get().getBasicProfile()
           setuser({googleId:profile.getId(),
             imageUrl:profile.getImageUrl(),
@@ -75,10 +89,10 @@ function App() {
 
     if(user){
       getresp()
-     
-
     }
   },[tok,details,update])
+
+
 
   const logout = ()=>{console.log('logged out');window.location.reload();}
   async function getresp(){
@@ -100,11 +114,31 @@ function App() {
         console.log('user not found')
       }
   }
+  const history = useHistory();
 
-  const onSuccess = res=>{
-    window.location.reload()
-  }
+  // const onSuccess = res=>{
+  // window.gapi?.load('auth2',()=>{
+  //       window.gapi.auth2.init({
+  //         client_id:clientId
+  //       }).then(()=>{
+  //         const obj = window.gapi.auth2.getAuthInstance()
+  //         if(obj.isSignedIn.get()){
+  //           let profile = obj.currentUser.get().getBasicProfile()
+  //           setuser({googleId:profile.getId(),
+  //             imageUrl:profile.getImageUrl(),
+  //             email:profile.getEmail(),
+  //             givenName:profile.getGivenName(),
+  //             name:profile.getName()
+  //           })
+  //          const tokk = obj.currentUser.get().getAuthResponse().id_token
+  //           setok(tokk)
+  //         }
+  //       }).then(()=>history.push('/'))
+  //     })
+    // setTimeout(()=>{if(user===null) window.location.reload()},3000)
+// }
 
+  // !user && onSuccess()
 
   const lightheme = createMuiTheme({
     overrides: {
@@ -143,28 +177,39 @@ function App() {
       },
     },
     palette: {
-      type:'light',
+      type:'dark',
       primary: 
       {
         // main:'#8f00ff', //violet
-        main:'#05Ce91', //green
+        // main:'#05Ce91', //green 
         // main:'#1EA5Fc', //blue
+        main:"#ff385d",
+        mainGradient: "linear-gradient(to right,#ff385d, #3541b5)",
+        ultamainGradient: "linear-gradient(to left,#ff385d, #3541b5)",
+        contrastText: '#fff',
         text: 'white'
       },
       secondary: {
         light: '#0066ff',
-        main: '#0044ff',
+        main: '#3541b5',
         contrastText: '#ffff',
       },
       info:{
         main:'#4103fc',
-        light: '#0066ff'
+        light: '#0066ff',
+        contrastText: '#ffff',
       },
       background:{
+        default:'#142057',
         // default:'#d6e9ff', //blue
         // default:'#d4bdff', //violet
-        default:'#f7f0c8', //green
-        paper:'#d4ffdc',
+        // default:'#f7f0c8', //green
+        // paper:'#d4ffdc',
+        // paper:'#70cefa'//prev
+        paper:'#ff385d',
+        contrastText: '#ffff',
+        
+
       },
       contrastThreshold: 4,
       
@@ -216,7 +261,8 @@ function App() {
         // main:'#8f00ff', //violet
         main:'#383838', //green
         // main:'#1EA5Fc', //blue
-        text: 'white'
+        text: 'white',
+        contrastText: '#fff',
       },
       secondary: {
         main: '#8a8a8a',
@@ -224,13 +270,15 @@ function App() {
       },
       info:{
         main:'#4103fc',
-        light: '#0066ff'
+        light: '#0066ff',
+        contrastText: '#ffff',
       },
       background:{
         // default:'#d6e9ff', //blue
         // default:'#d4bdff', //violet
         default:'black', //green
         paper:'#474747',
+        contrastText: '#ffff',
       },
       contrastThreshold: 4,
 
@@ -238,19 +286,17 @@ function App() {
     },
   });
 
-const history = useHistory();
   return (
     < ThemeProvider theme={details?.darkmode?darktheme:lightheme}>
-    <AuthContext.Provider value={{user,setuser,tok,details}}>
+    <AuthContext.Provider value={{user,setuser,setok,setdetails,tok,details}}>
     <CssBaseline/>
     <Router >
     <Switch> 
       <>
-
-          {signin?<></>:<AppBar position='static'>
-        <Toolbar >
+          {!details?<></>:<AppBar position='static'>
+        <Toolbar>
             <Container>
-          <Grid container alignItems='center'>
+          <Grid container justify='flex-end' alignItems='center'>
             <Grid item lg={8} md={7} xs={12}>
               <Grid container justify='center'>
                 <Grid item xs={5}>
@@ -278,17 +324,17 @@ const history = useHistory();
 
           
          <Grid item lg={4} md={5} xs={12} >
-           <Grid container justify='center' alignItems='center'>
+           <Grid container justify='center' alignItems='center' >
 
           <Grid item xs={2}>  
-          {user && !signin?<Link style={{textDecoration:'None'}} to='/'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
+          {details && !signin?<Link style={{textDecoration:'None'}} to='/'><Typography color='textPrimary'> Feed </Typography></Link>:<></>}
           </Grid>   
           <Grid item xs={2}>   
         <Link style={{textDecoration:'None'}} to='/chat'  >
           <IconButton>
           {!details?.unreadchats?
           <ChatIcon/>:
-          <Badge color='error' badgeContent={unread}>
+          <Badge color='secondary' badgeContent={unread}>
           <ChatIcon />
           </Badge>}
           </IconButton>
@@ -299,7 +345,7 @@ const history = useHistory();
             <IconButton>
           {!details?.notifications?
           <NotificationsIcon/>:
-          <Badge color='error' badgeContent={details.notifications}>
+          <Badge color='secondary' badgeContent={details.notifications}>
           <NotificationsIcon />
           </Badge>}
           </IconButton>
@@ -314,23 +360,32 @@ const history = useHistory();
           
           </Grid>
           <Grid item > 
+          <IconButton>
         {user?
          <div>
           <GoogleLogout
           clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
           buttonText="Logout"
+          render={renderProps => (
+            <Button  variant='contained' color='secondary' onClick={renderProps.onClick}>
+             Logout
+            </Button>
+           )} 
           onLogoutSuccess={logout}>
           </GoogleLogout>
           </div>
          :<div>
-         <GoogleLogin
+         {/* <GoogleLogin
         clientId={clientId}
         redirectUri={'/'}
         buttonText="Login"
         onSuccess={onSuccess}
         cookiePolicy={'single_host_origin'}
-        isSignedIn={true}></GoogleLogin></div>
+        isSignedIn={true}></GoogleLogin> */}
+        <></>
+        </div>
         }
+        </IconButton>
         {/* </MenuItem> */}
         </Grid>
         </Grid>
@@ -345,7 +400,8 @@ const history = useHistory();
         <Route path="/signup">
           <GLogin/>
         </Route>
-         {signin?<Redirect to='/signup'/>:<></>}
+         {/* {signin?<Redirect to='/signup'/>:<></>} */}
+        {!signin? <Redirect to='/signup'/>:<></>}
         {/* <Route path="/">
           <Redirect to='/signup'/></Route> */}
           <Route path='/user'>{!details?<></>:<div><User/><Feed /></div>}</Route>

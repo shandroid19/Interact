@@ -1,6 +1,8 @@
 import React, {useRef,useState, useContext, useEffect} from "react";
 import Addpost from './Addpost'
 import {useParams,useHistory } from 'react-router-dom'
+import {makeStyles,useTheme} from '@material-ui/styles'
+
 import LinearProgress from '@material-ui/core/LinearProgress'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
@@ -17,8 +19,6 @@ function User()
     var eyed = id
     const [edit,setedit] = useState(false)
     const [loading,setloading] = useState(false)
-
-
     // const [cover,setcover]= useState(context.details.cover)
     const [dp,setdp]= useState(null)
     const [openfollowers,setopenfollowers] = useState(false)
@@ -32,12 +32,20 @@ function User()
     const [priv,setpriv] = useState(context.details.private)
     const [dark,setdark] = useState(context.details.darkmode)
     const followingsloader = useRef(null);
+    const [autherr,setautherr]=useState(false)
 const [followingspage,setfollowingspage] = useState(1)
 const [followingsmax,setfollowingsmax] = useState(1)
 const followerloader = useRef(null);
 const [followerpage,setfollowerpage] = useState(1)
 const [followermax,setfollowermax] = useState(1)
     const history = useHistory()
+    const theme = useTheme()
+
+
+    useEffect(()=>{
+        if(!window.gapi)
+           history.push('/signup')
+    },[])
     useEffect(()=>{
         fetch('https://interact-9535.herokuapp.com/user/'+id+'/get',
         {
@@ -52,16 +60,15 @@ const [followermax,setfollowermax] = useState(1)
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{console.log(resp.json())}).then(()=>window.location.reload())
     }
     const unfollow = ()=>{
         fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/unfollow',
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{console.log(resp.json())}).then(()=>window.location.reload())
+     
     }
 
     const sendrequest = ()=>{
@@ -69,8 +76,8 @@ const [followermax,setfollowermax] = useState(1)
         {
             method:'POST',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{console.log(resp.json())}).then(()=>window.location.reload())
+    
     }
 
     const cancelrequest = ()=>{
@@ -78,8 +85,7 @@ const [followermax,setfollowermax] = useState(1)
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{console.log(resp.json())}).then(()=>window.location.reload())
     }
 
     const rejectrequest = ()=>{
@@ -87,16 +93,16 @@ const [followermax,setfollowermax] = useState(1)
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{window.location.reload()})
+        
     }
     const acceptrequest = ()=>{
         fetch('https://interact-9535.herokuapp.com/user/'+eyed+'/acceptrequest',
         {
             method:'POST',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        }).then((resp)=>{console.log(resp.json())})
-        window.location.reload()
+        }).then((resp)=>{window.location.reload()})
+        
     }
     const uploadImage = async e=> {
         setloading(true)
@@ -128,7 +134,12 @@ const [followermax,setfollowermax] = useState(1)
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
             body: JSON.stringify({username:username.current.value,name:name.current.value,profilePicture:dp,city:city.current.value,bio:bio.current.value,darkmode:dark,private:priv}),
-        }).then(()=>{window.location.reload()})
+        }).then((resp)=>{
+            if (resp.status ===500 ){
+                setautherr(true)
+            }
+            else
+                window.location.reload()})
         } 
 
     const getfollowers = ()=>{
@@ -201,19 +212,11 @@ useEffect(() => {
 
 }, [followers,followermax]);
 
-// const followersdialog =<Dialog open={openfollowers} onClose={()=>setopenfollowers(false)}>
-// <DialogTitle style={{paddingBottom:0}}><Typography>Followers</Typography></DialogTitle>
-// <DialogContent style={{height:'60vh'}}>
-// { followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
-// </CardHeader></ButtonBase>})}
-// <div ref={followerloader}></div>
-// </DialogContent>
-// </Dialog>
 const followersdialog =<Dialog  open={openfollowers} onClose={()=>setopenfollowers(false)}>
 <DialogTitle style={{paddingBottom:0}}><Typography>Followers</Typography></DialogTitle>
 <DialogContent style={{height:'60vh'}}>
-{ followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
-</CardHeader></ButtonBase>})}
+{ followers.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><Grid container><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+</CardHeader></Grid></ButtonBase>})}
 <div ref={followerloader}></div>
 </DialogContent>
 </Dialog>
@@ -262,8 +265,9 @@ useEffect(() => {
 const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollowings(false)}>
 <DialogTitle style={{paddingBottom:0}}><Typography>Following</Typography></DialogTitle>
 <DialogContent style={{height:'60vh'}}>
-{ followings.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
-</CardHeader></ButtonBase>})}
+{ followings.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}>
+<Grid><CardHeader  key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+</CardHeader></Grid></ButtonBase>})}
 <div ref={followingsloader}></div>
 </DialogContent>
 </Dialog>
@@ -277,11 +281,11 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
         {edit?<>
         
         <Grid container justify='center' alignItems='center'>
-  <Grid item item lg={7} md={9} sm={10}>
+  <Grid item  lg={7} md={9} sm={10}>
   <Box boxShadow={20} style={{margin:'1rem'}}  boxshadow={20}>
-  <Card >
+  <Card style={{background: theme.palette.primary.mainGradient}} >
       <CardContent>
-          <Grid container container justify='center' alignItems='center' spacing={4}>
+          <Grid container justify='center' alignItems='center' spacing={4}>
                  <Grid item xs={3} md={2}>
                  {loading?<CircularProgress/>:<img style={{width:'100%'}} src={dp}/>}
                <input  onChange={uploadImage} accept="image/*" id='inputpic' type='file' hidden/> 
@@ -316,11 +320,11 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
                     </Grid>
                 </Grid>
                 </Grid>
+                <Grid item>
+                    {autherr?<p style={{color:'red'}}>Username is already taken.</p>:<></>}
+                </Grid>
               <Grid item sm={4}>
-                  {/* {context.user.googleId===id?edit?<div><Button onClick={handleSubmit} variant='primary'>save</Button> <Button onClick={()=>{setedit(false)}}>close</Button></div>:<Button variant='outlined' color='primary' onClick={setEdit}>Edit profile</Button>:  
-      details.followers.indexOf(context.user.googleId)===-1?<Button onClick={follow} variant="contained" color="primary">
-      Follow</Button>:
-  <Button onClick={unfollow} variant="contained" color="secondary">Unfollow</Button>} */}
+             
                 <Grid container>
                     <Grid item xs={6}>
                     <Button onClick={handleSubmit} variant='outlined'>save</Button>
@@ -347,9 +351,8 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
   <Grid item lg={7} md={9} sm={10}>
  <Box boxShadow={20} style={{margin:'1rem'}}> 
 
-  <Card >
-    {/* <Card style={{background:'linear-gradient(45deg, #8F00FF 30%, #d4bdff 90%)'}}> */}
-    {/* <Card style={{background:'linear-gradient(45deg, #c3dcfa 30%, #509ffa 90%)'}}> */}
+  <Card style={{background: theme.palette.primary.mainGradient}}  >
+  
 
       <CardContent>
           <Grid  container justify='center' alignItems='center' spacing ={4}>
@@ -384,7 +387,7 @@ context.user.googleId===id?<Grid item xs={6}><Button variant='outlined' onClick=
         
 { details.requests.indexOf(context.user.googleId)===-1?
       <Grid item xs={3}>{details.followers.indexOf(context.user.googleId)===-1?
-    <Button onClick={sendrequest} variant="contained" color="primary">
+    <Button onClick={sendrequest} variant="contained" color="secondary">
       Follow
   </Button>:
   <Button onClick={unfollow} variant="contained" color="secondary">

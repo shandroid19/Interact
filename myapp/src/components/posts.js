@@ -68,9 +68,9 @@ export default function Post({post})
         {
             method:'DELETE',
             headers:{'Content-Type':'application/json','Authorization':context.tok}
-        })
+        }).then(()=>window.location.reload())
         setopen(false)
-        window.location.reload()
+        
     }
    
    
@@ -93,8 +93,8 @@ export default function Post({post})
       body: JSON.stringify({
         comment:comm.current.value,
       })
-      })
-      window.location.reload()
+      }).then(()=>window.location.reload())
+      
     }
     
 
@@ -107,8 +107,8 @@ export default function Post({post})
         {
         method:'DELETE',
         headers:{'Content-Type':'application/json','Authorization':context.tok},
-        })
-        window.location.reload()
+        }).then(()=>window.location.reload())
+
       }
       return(
         <CardHeader key={index} style={{padding:'0',width:"100%"}} avatar={<Avatar src={comment.profilePicture}></Avatar>}
@@ -198,9 +198,9 @@ useEffect(()=>{
   const getliked =<Dialog open={openlikes} onClose={()=>setopenlikes(false)}>
       <DialogTitle style={{paddingBottom:0}}>Likes</DialogTitle>
       <DialogContent style={{height:'60vh'}}>
-     { liked.map((user,index)=>{return <ButtonBase style={{width:'100%'}} onClick={()=>history.push(user.userId)}><CardHeader key={index} avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
+     { liked.map((user,index)=>{return <ButtonBase key={index} style={{width:'100%'}} onClick={()=>history.push(user.userId)}><Grid container><Grid item><CardHeader  avatar={<Avatar src={user.profilePicture}></Avatar>} title={user.username}>
       <div ref={likeloader}></div>
-      </CardHeader></ButtonBase>})}
+      </CardHeader></Grid></Grid></ButtonBase>})}
       </DialogContent>
   </Dialog>
 
@@ -219,7 +219,8 @@ useEffect(()=>{
       </Dialog>
 
     <Box boxShadow={20} style={{margin:'1rem'}}>
-    <Card className={theme.root} >
+    <Card className={theme.root} style={{ background: theme.palette.primary.mainGradient }}
+ >
       <CardHeader
         avatar={
             <Avatar src={post.profilePicture}></Avatar>
@@ -232,10 +233,10 @@ useEffect(()=>{
         title={<Typography variant='h6'>{post.username}</Typography>}
         subheader={format(post.createdAt)}
       />
-<div style={{width:'100%',display:'flex', justifyContent:'center'}}>
+<div style={{width:'100%',display:'flex', justifyContent:'center', backgroundColor:'black'}} >
                  <img style={{objectFit:'contain',maxHeight:'30rem',width:'100%'}} src={post.img}/>
                 </div>
-        <CardContent>
+        <CardContent >
         <Typography color="textSecondary" component="p">
             {post.caption}
         </Typography>
@@ -245,7 +246,7 @@ useEffect(()=>{
         </IconButton>
         <a onClick={getlikes}><b >Likes: {likes?number+1:number}</b></a>
 
-    <Accordion onClick={()=>{getcomments()}} style={{margin:0,padding:0}}>
+    <Accordion  onClick={()=>{getcomments()}} style={{margin:0,padding:0,background: theme.palette.primary.mainGradient }}>
     <AccordionSummary style={{padding:0}}>
     <b>&nbsp; comments: {post.comments} <IconButton
 

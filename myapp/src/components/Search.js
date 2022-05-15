@@ -2,7 +2,7 @@
 
 import CardHeader from '@material-ui/core/CardHeader'
 import ButtonBase from '@material-ui/core/ButtonBase'
-import Grid from '@material-ui/core/Grid'
+import {Grid,Avatar,Card, Typography} from '@material-ui/core'
 import Container from '@material-ui/core/Container'
 import { useEffect, useState } from 'react'
 import InputBase from '@material-ui/core/TextField'
@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     search: {
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.1),
+        backgroundColor: fade(theme.palette.common.white, 0.4),
         '&:hover': {
           backgroundColor: fade(theme.palette.common.white, 0.2),
         },
@@ -80,10 +80,25 @@ export default function SearchComponent()
     renderOption={(object) => (
         <ButtonBase style={{padding:0,height:'100%',width:'100%'}} onClick={()=>{
           history.push('/users/'+object.userId);
-          // window.location.reload()
           }}>
-        <CardHeader style={{padding:0}} avatar={ <img width='30rem' height='30rem' style={{borderRadius:'50%'}} src={object.profilePicture}></img>} title={object.username}>
+          <Grid container>
+            <Grid item>
+        <CardHeader style={{padding:0,width:'100%',height:'100%'}} avatar={ <img width='30rem' height='30rem' style={{borderRadius:'50%'}} src={object.profilePicture}></img>} title={object.username}>
         </CardHeader>
+          </Grid>
+        </Grid>
+        {/* <Card style={{width:'100%'}}>
+          <Grid container>
+            <Grid item xs={4}>
+          <Avatar src={object.profilePicture}/>
+          </Grid>
+          <Grid item xs={8}>
+            <Typography>
+            {object.username}
+            </Typography>
+            </Grid>
+          </Grid>
+        </Card> */}
         </ButtonBase>
     )}
     renderInput={(params) => (

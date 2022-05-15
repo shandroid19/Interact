@@ -7,69 +7,66 @@ import {Typography,Step,StepLabel,Stepper,Switch,Button,TextField,Grid,Box,Card,
 
 export default function Signup(){
 const bio = useRef(null)
-const cover = useRef(null)
 const username = useRef(null)
 const name = useRef(null)
-const [user,setuser] = useState(null)
 const history = useHistory();
 
-
-
-
 const clientId='504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com'
-// const {signIn} = useGoogleLogin({client_id:clientId})
 const city = useRef(null)
 const [autherr,setautherr] = useState(null)
-const [filedata,setData] = useState(null)
-const [loading,setLoading] = useState(false)
 const [dark,setdark] = useState(false)
 const [priv,setpriv] = useState(false)
 const [jokes,setjokes]=useState(false)
    const context = useContext(AuthContext);
    const Memer = require("random-jokes-api");
-
+   const [next,setnext] = useState(true)
 
    useEffect(()=>{
-      if(window.gapi)
+      if(!context.details)
          signIn()
-   },[window.gapi])
+   },[])
 
    const onSuccess = (obj)=>
    {
+         context.setok(obj.tokenId)
+         context.setuser({googleId:obj.profileObj.googleId,
+               imageUrl:obj.profileObj.imageUrl,
+               email:obj.profileObj.email,
+               givenName:obj.profileObj.givenName,
+               name:obj.profileObj.name
+             }
+         )
       fetch('https://interact-9535.herokuapp.com/auth/login',{
          method:'POST',
          body: JSON.stringify({userId:obj.profileObj.googleId}),
-         headers:{'Content-Type':'application/json','Authorization':obj.profileObj.googleId}
-      }).then((resp)=>{
+         headers:{'Content-Type':'application/json','Authorization':obj.tokenObj.id_token}
+      }).then(async (resp)=>{
+         const res = await resp.json()
          if(resp.status===200 || resp.status===204){
-            history.push('/users/'+obj.profileObj.googleId)
-         }
-         else
-         {
-            window.location.reload();
+                  history.push('/')
+                  if(!context.details)
+                  context.setdetails(res.user)
          }
       })
    }
 
-
-   // console.log(context)
-   // setdetails(context.user)
-   // console.log(context)
    function onf(ob){
-      // setdetails(ob.profileObj);
-      // setok(ob.profileObj.tokenObj.id_token)
       fetch('https://interact-9535.herokuapp.com/auth/login',{
          method:'POST',
          body: JSON.stringify({userId:ob.profileObj.googleId}),
          headers:{'Content-Type':'application/json','Authorization':ob.tokenObj.id_token}
       }).then((resp)=>{
          if(resp.status===200 || resp.status===204){
-            history.push('/users/'+ob.profileObj.googleId)
-         }})
+            history.push('/')
+         }
+         else 
+         {
+            setnext(false)
+         }
+      })
    }
    const {signIn} = useGoogleLogin({clientId:clientId,onSuccess:onf,isSignedIn:true})
 
-//    // signIn()
 
    async function handleSubmit(e)
   {   
@@ -86,39 +83,12 @@ const [jokes,setjokes]=useState(false)
       else{
       const out = await resp.json()
       console.log(out)
-      // localStorage.setItem('user', JSON.stringify(out.user))
-      // context.setuser(out.user)
+
       setautherr(false)
-      console.log('done')
-      history.push('/')
       window.location.reload()
       }
       } 
       
-
-   //    const uploadImage = async e=> {
-          
-   //       const files = e.target.files
-   //       const data = new FormData()
-   //       data.append('file',files[0])
-   //       data.append('upload_preset','pigeon')
-   //       let filname=files[0].name.toLowerCase();
-   //       if(!(filname.endsWith('.jpg')||filname.endsWith('.png')||filname.endsWith('.jpeg')))
-   //         {
-   //           alert("Only '.png' , '.jpg' and '.jpeg' formats supported!");
-   //           return;
-   //         }
-   //         setLoading(true)
-           
-   //       const res = await fetch("https://api.cloudinary.com/v1_1/shandroid/image/upload",
-   //       {
-   //           method: 'POST',
-   //           body:data
-   //       })
-   //       const file = await res.json()
-   //       setData(file.secure_url);
-   //       setLoading(false)
-   //   }
    const joke = ()=>{
       return(
          <div>
@@ -199,9 +169,7 @@ const [jokes,setjokes]=useState(false)
             <Grid item xs={12}>
                <TextField multiline inputRef={bio} rows={4} fullWidth variant='outlined' placeholder='bio'></TextField>
             </Grid>
-            {/* <Grid container justify='center'>
-                  <Button onClick={handleSubmit} variant='contained' color='primary'>Next</Button>
-            </Grid> */}
+
                      {autherr?<Grid item xs={12}><p style={{color:'red'}}>username is already taken</p></Grid>:<></>}
                      <Grid item xs={12}>
                         <Grid container spacing={2} justify='center'>
@@ -215,7 +183,7 @@ const [jokes,setjokes]=useState(false)
                      </Grid>
          </Grid>
          </div>
-                     :<></>)
+         :<></>)
    } 
 
 
@@ -230,7 +198,11 @@ const [jokes,setjokes]=useState(false)
          <div>
           <GoogleLogout
           clientId="504774353232-i4ctofb91259kii33088t50e8cl2c2si.apps.googleusercontent.com"
-          buttonText="Logout"
+          render={renderProps => (
+            <Button color='secondary' variant='contained' onClick={renderProps.onClick}>
+             Logout
+            </Button>
+           )}  
           onLogoutSuccess={()=>{window.location.reload()}}
           >
           </GoogleLogout>
@@ -238,8 +210,12 @@ const [jokes,setjokes]=useState(false)
          :<div>
          <GoogleLogin
         clientId={clientId}
-        buttonText="Login"
         onSuccess={onSuccess}
+        render={renderProps => (
+         <Button color='secondary' variant='contained' onClick={renderProps.onClick}>
+          Login
+         </Button>
+        )}        
         cookiePolicy={'single_host_origin'}
         isSignedIn={true}></GoogleLogin></div>
         }
@@ -255,7 +231,7 @@ const [jokes,setjokes]=useState(false)
          <Grid item xs={12}>
             <Grid container justify='flex-end'>
                <Grid item>
-            <Button variant='contained' disabled={context.user===null?true:false} color='secondary' onClick={handleNext}>Next</Button>
+            <Button variant='contained' disabled={!context.user && next?true:false} color='secondary' onClick={handleNext}>Next</Button>
                </Grid>
             </Grid>
          </Grid>
@@ -297,7 +273,7 @@ const [jokes,setjokes]=useState(false)
 return (<div style={{marginBottom:'5rem'}}>
    <div >
       <Grid container justify='center'>
-            <Grid item sm={4}>
+            <Grid item sm={6}>
             <Box boxShadow={22} >
 
          <Card style={{marginTop:'2rem'}}>
@@ -319,5 +295,5 @@ return (<div style={{marginBottom:'5rem'}}>
       </Grid>
    </div>
 
-                     </div>)
+   </div>)
    }
