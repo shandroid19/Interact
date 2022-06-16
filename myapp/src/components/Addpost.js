@@ -10,6 +10,8 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import { CircularProgress, Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Compressor from 'compressorjs';
+
 
 export default function Addpost()
 { 
@@ -29,15 +31,42 @@ export default function Addpost()
     const uploadImage = async e=> {
         setloading(true)
         const files = e.target.files
+        if (!files[0]) {
+            return;
+          }
+        // const data = new FormData()
+        // data.append('file',files[0])
+        // data.append('upload_preset','pigeon')
+        // let filname=files[0].name.toLowerCase();
+        // if(!(filname.endsWith('.jpg')||filname.endsWith('.png')||filname.endsWith('.jpeg')))
+        //   {
+        //     alert("Only '.png' , '.jpg' and '.jpeg' formats supported!");
+        //     return;
+        //   }      
+        // console.log(files[0])   
+
+        // const res = await fetch("https://api.cloudinary.com/v1_1/shandroid/image/upload",
+        // {
+        //     method: 'POST',
+        //     body:data
+        // })
+        // const file = await res.json()
+        // setImage(file.secure_url);
+        // setloading(false)
+        new Compressor(files[0], {
+            quality: 0.6,
+            async success(result) {
         const data = new FormData()
-        data.append('file',files[0])
+        data.append('file',result)
         data.append('upload_preset','pigeon')
-        let filname=files[0].name.toLowerCase();
+        let filname=result.name.toLowerCase();
         if(!(filname.endsWith('.jpg')||filname.endsWith('.png')||filname.endsWith('.jpeg')))
           {
             alert("Only '.png' , '.jpg' and '.jpeg' formats supported!");
             return;
-          }          
+          }      
+        console.log(result)   
+
         const res = await fetch("https://api.cloudinary.com/v1_1/shandroid/image/upload",
         {
             method: 'POST',
@@ -46,6 +75,12 @@ export default function Addpost()
         const file = await res.json()
         setImage(file.secure_url);
         setloading(false)
+            },
+            error(err) {
+              console.log(err.message);
+            },
+          });
+
     }
 
 
@@ -84,17 +119,17 @@ export default function Addpost()
                     rows={4}
                     />
                     </Grid>
-                    <Grid item >
-                      <input type="file" hidden onChange={uploadImage} id="file" /> 
+                    <Grid className='upload' >
+                      <input type="file"  hidden onChange={uploadImage} id="file" /> 
                         <label htmlFor="file">click here to upload image</label>
                       </Grid>
                  <div>
-                 {loading?<div style={{justifyContent:'center',display:'flex'}}><CircularProgress/></div>:
+                 {loading?<div style={{justifyContent:'center',display:'flex',marginTop:"2rem",marginBottom:'2rem'}}><CircularProgress/></div>:
                  img?    <div style={{width:'100%',display:'flex', justifyContent:'center'}}>
-                 <img style={{objectFit:'contain',maxHeight:'30rem',width:'100%'}} src={img}/>
+                 <img style={{objectFit:'contain',maxHeight:'30rem',width:'100%',marginBottom:'2rem'}} src={img}/>
                 </div>:<></>}
                 </div>
-                 <div style={{width:'100%',justifyContent:'center',display:'flex'}}>
+                 <div style={{width:'100%',justifyContent:'center',display:'flex',marginBottom:'2rem'}}>
                     <Grid ><Button variant='contained'color='primary' type='submit'>Post</Button></Grid>
                     </div>
                     </Grid>

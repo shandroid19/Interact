@@ -55,6 +55,8 @@ export default function Post({post})
         {
             method:'PUT',
             headers:{'Content-Type':'application/json','Authorization':context.tok},
+        }).catch(()=>{
+          console.log("could not like")
         })
         setlikes(!likes)
         // setadd(add==1?0:1)
@@ -230,7 +232,7 @@ useEffect(()=>{
         <DeleteForeverOutlined/>
           </IconButton>:null
         }
-        title={<Typography variant='h6'>{post.username}</Typography>}
+        title={<a onClick={()=>history.push('/users/'+post.userId)}><Typography variant='h6' on>{post.username}</Typography></a>}
         subheader={format(post.createdAt)}
       />
 <div style={{width:'100%',display:'flex', justifyContent:'center', backgroundColor:'black'}} >
@@ -241,10 +243,10 @@ useEffect(()=>{
             {post.caption}
         </Typography>
         </CardContent>
-        <IconButton aria-label="like" onClick={like}>
+        <IconButton aria-label="like" onClick={()=>like()}>
         {likes?<CheckCircle/>:<CheckCircleOutlinedIcon/>}
         </IconButton>
-        <a onClick={getlikes}><b >Likes: {likes?number+1:number}</b></a>
+        <a onClick={()=>getlikes()}><b >Likes: {likes?number+1:number}</b></a>
 
     <Accordion  onClick={()=>{getcomments()}} style={{margin:0,padding:0,background: theme.palette.primary.mainGradient }}>
     <AccordionSummary style={{padding:0}}>
@@ -290,12 +292,12 @@ useEffect(()=>{
       </Popover>        
         </Grid>
         <Grid item xs={2}>
-        <IconButton aria-describedby={id} variant="contained" color="primary" onClick={handleClick}>
+        <IconButton aria-describedby={id} variant="contained" color="primary" onClick={(e)=>handleClick(e)}>
           <EmojiEmotions/>
         </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Button variant='contained' color='primary' onClick={postcomment}>
+          <Button variant='contained' color='primary' onClick={()=>postcomment()}>
             Comment
           </Button></Grid>
         </Grid>

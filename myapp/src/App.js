@@ -4,6 +4,7 @@ import SearchComponent from './components/Search'
 import Notifications from './components/Notifications'
 import SinglePost from './components/SinglePost';
 import './App.css'
+import logo from './components/favicon.png'
 import {Menu,InputBase,MenuItem,Box} from '@material-ui/core'
 import {Mail,More,AccountCircle} from '@material-ui/icons'
 import {Badge,Grid,CssBaseline,AppBar,Avatar,Toolbar,IconButton,Typography,Container,Button} from '@material-ui/core'
@@ -50,6 +51,8 @@ function App() {
   const [unread,setunread] = useState(0)
   // const notid = notopen ? 'not-popper' : undefined;
   const {signIn} = useGoogleLogin({clientId:clientId,onSuccess:onSuccess,isSignedIn:true})
+
+
   function onSuccess(ob){
   fetch('https://interact-9535.herokuapp.com/auth/login',{
     method:'POST',
@@ -63,31 +66,38 @@ function App() {
   useEffect(()=>{
     if(window.gapi)
        signIn()
- },[window.gapi])
+ },[])
 
-  useEffect(()=>{
-    let obj;
-    if(window.gapi){
-    window.gapi.load('auth2',()=>{
-      window.gapi.auth2.init({
-        client_id:clientId
-      }).then(()=>{
-        obj = window.gapi.auth2.getAuthInstance()
-        if(obj.isSignedIn.get()){
-          let profile = obj.currentUser.get().getBasicProfile()
-          setuser({googleId:profile.getId(),
-            imageUrl:profile.getImageUrl(),
-            email:profile.getEmail(),
-            givenName:profile.getGivenName(),
-            name:profile.getName()
-          })
-         const tokk = obj.currentUser.get().getAuthResponse().id_token
-          setok(tokk)
-        }
-      }).catch((err)=>{console.log(err)})
-    })
-  }
-  },[])
+  // useEffect(()=>{
+  //   let obj;
+  //   if(window.gapi){
+  //   window.gapi.load('auth2',()=>{
+  //     window.gapi.auth2.init({
+  //       client_id:clientId
+  //     }).then(()=>{
+  //       // console.log('signing in')
+  //       obj = window.gapi.auth2.getAuthInstance()
+  //       if(obj.isSignedIn.get()){
+  //         let profile = obj.currentUser.get().getBasicProfile()
+  //         setuser({googleId:profile.getId(),
+  //           imageUrl:profile.getImageUrl(),
+  //           email:profile.getEmail(),
+  //           givenName:profile.getGivenName(),
+  //           name:profile.getName()
+  //         })
+  //         // setdetails({googleId:profile.getId(),
+  //         //   imageUrl:profile.getImageUrl(),
+  //         //   email:profile.getEmail(),
+  //         //   givenName:profile.getGivenName(),
+  //         //   name:profile.getName()
+  //         // })
+  //        const tokk = obj.currentUser.get().getAuthResponse().id_token
+  //         setok(tokk)
+  //       }
+  //     }).catch((err)=>{console.log(err)})
+  //   })
+  // }
+  // },[])
 
 
   useEffect(()=>{
@@ -114,23 +124,24 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
+    // marginRight: theme.spacing(2),
+    marginLeft: theme.spacing(1),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       marginLeft: theme.spacing(3),
       width: 'auto',
     },
   },
-  searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  // searchIcon: {
+  //   padding: theme.spacing(0, 2),
+  //   height: '100%',
+  //   position: 'absolute',
+  //   pointerEvents: 'none',
+  //   display: 'flex',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+    
+  // },
   inputRoot: {
     color: 'inherit',
 
@@ -587,9 +598,10 @@ const classes = useStyles();
         <AppBar position="static">
           <Toolbar>
              <Link style={{textDecoration:'none'}} to='/'>
-           <Typography color='textPrimary' className={classes.title} variant="h5">
+           {/* <Typography color='textPrimary' className={classes.title} variant="h5">
            Interact
-          </Typography>
+          </Typography> */}
+          <img className='logo' src = {logo}></img>
            </Link>
             <div className={classes.search}>
               <SearchComponent/>

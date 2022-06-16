@@ -1,4 +1,5 @@
 import React, {useRef,useState, useContext, useEffect} from "react";
+import '../App.css'
 import Addpost from './Addpost'
 import {useParams,useHistory } from 'react-router-dom'
 import {makeStyles,useTheme} from '@material-ui/styles'
@@ -10,6 +11,7 @@ import Box from '@material-ui/core/Box'
 
 import {AuthContext} from '../App'
 import { Typography,Switch,DialogContent,Dialog,DialogTitle,CardHeader,CardContent,Card,Grid,CircularProgress,InputBase,TextField,ButtonBase,Avatar } from "@material-ui/core";
+import Compressor from 'compressorjs';
 
 function User()
 {
@@ -105,12 +107,23 @@ const [followermax,setfollowermax] = useState(1)
         
     }
     const uploadImage = async e=> {
-        setloading(true)
         const files = e.target.files
+        if (!files[0]) {
+            return;
+          }
+        
+          new Compressor(files[0], {
+            quality: 0.6,
+        
+            // The compression process is asynchronous,
+            // which means you have to access the `result` in the `success` hook function.
+            async success(result) {
+
+        setloading(true)
         const data = new FormData()
-        data.append('file',files[0])
+        data.append('file',result)
         data.append('upload_preset','pigeon')
-        let filname=files[0].name.toLowerCase();
+        let filname=result.name.toLowerCase();
         if(!(filname.endsWith('.jpg')||filname.endsWith('.png')||filname.endsWith('.jpeg')))
           {
             alert("Only '.png' , '.jpg' and '.jpeg' formats supported!");
@@ -124,7 +137,9 @@ const [followermax,setfollowermax] = useState(1)
         const file = await res.json()
         setdp(file.secure_url);
         setloading(false)
-    }
+    
+    }})
+}
 
     async function handleSubmit(e)
     {   
@@ -285,15 +300,16 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
   <Card elevation={0}  style={{background: theme.palette.primary.card}} >
       <CardContent>
           <Grid container justify='center' alignItems='center' spacing={4}>
-                 <Grid item xs={3} md={2}>
-                 {loading?<CircularProgress/>:<img style={{width:'100%',borderRadius:'50%'}} src={dp}/>}
+                 <Grid item xs={12} sm={3} style={{justifyContent:'center',display:'flex'}} >
+                 {loading?<CircularProgress/>:<label htmlFor='inputpic'>     
+                 <img className='roundedImage' src={dp}/>  
+               {/* <Button variant='contained' style={{marginTop:'1rem'}} color='primary' component='span'>upload</Button> */}
+                </label>}
                <input  onChange={uploadImage} accept="image/*" id='inputpic' type='file' hidden/> 
-                 <label htmlFor='inputpic'>       
-               <Button variant='contained' style={{marginTop:'1rem'}} color='primary' component='span'>upload</Button>
-                </label>
+                 
 
                 </Grid>
-      <Grid item xs={9} md={10}>
+      <Grid item xs={12} sm={9}>
       <Grid container direction='column' spacing={1}>
               <Grid item sm={8}>
                  <TextField inputRef={username} fullWidth variant='standard' label='Username' defaultValue={details.username} />
@@ -355,10 +371,10 @@ const followingsdialog =<Dialog  open={openfollowings} onClose={()=>setopenfollo
 
       <CardContent>
           <Grid  container justify='center' alignItems='center' spacing ={4}>
-          <Grid item xs={3} md={2}>
-              <img style={{width:'100%',borderRadius:'50%'}} src={details.profilePicture}/>
+          <Grid item xs={12} sm={3} style={{justifyContent:'center',display:'flex'}}>
+              <img className = 'roundedImage' src={details.profilePicture}/>
           </Grid>
-      <Grid item xs={9} md={10}>
+      <Grid item xs={12} sm={9}>
           <Grid container >
               <Grid item xs={12}>
                  <Typography variant='h5'>{details.username}</Typography>
